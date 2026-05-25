@@ -1,0 +1,37 @@
+.karta-itemu {
+    display: inline-flex;
+    align-items: center;
+    border: 3px dashed gold;
+    border-radius: 20px;
+    padding: 10px;
+    gap: 15px;
+    background-color: #1eb62d; /* Dodajmy jej ciemnoszare tło (jak w ekwipunku Minecrafta!) */
+    
+    /* --- PRZENOSIMY CIEŃ TUTAJ --- */
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.4);
+    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+/* Teraz po najechaniu myszką na CAŁĄ KARTĘ, karta urośnie i rzuci większy cień! */
+.karta-itemu:hover {
+    box-shadow: 15px 15px 30px rgba(0, 0, 0, 0.6);
+    transform: scale(1.05); /* Cała karta delikatnie się powiększy */
+}
+.miecz1 {
+    border-radius: 4px;
+    width: 80px;
+    height: 80px;
+    
+    /* 1. POPRAWKA: Cień bez przecinków między pikselami */
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); 
+    
+    /* 2. POPRAWKA: Łączymy obie płynności w JEDNEJ linijce */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.miecz1:hover {
+    box-shadow: 20px 20px 40px rgba(0,0,0,0.6);
+    
+    /* Zmieńmy scale na 1.5 – teraz nie da się tego przegapić! */
+    transform: rotate(45deg) scale(1.5); 
+}
