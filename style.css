@@ -1,37 +1,114 @@
-.karta-itemu {
-    display: inline-flex;
-    align-items: center;
-    border: 3px dashed gold;
-    border-radius: 20px;
-    padding: 10px;
-    gap: 15px;
-    background-color: #1eb62d; /* Dodajmy jej ciemnoszare tło (jak w ekwipunku Minecrafta!) */
-    
-    /* --- PRZENOSIMY CIEŃ TUTAJ --- */
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.4);
-    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+
+body {
+    background-color: aquamarine;
 }
 
-/* Teraz po najechaniu myszką na CAŁĄ KARTĘ, karta urośnie i rzuci większy cień! */
-.karta-itemu:hover {
-    box-shadow: 15px 15px 30px rgba(0, 0, 0, 0.6);
-    transform: scale(1.05); /* Cała karta delikatnie się powiększy */
+.figury {
+    height: 250px;
+    width: 400px;
+    border-radius: 10px;
 }
-.miecz1 {
-    border-radius: 4px;
-    width: 80px;
-    height: 80px;
-    
-    /* 1. POPRAWKA: Cień bez przecinków między pikselami */
-    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3); 
-    
-    /* 2. POPRAWKA: Łączymy obie płynności w JEDNEJ linijce */
+
+.bryly {
+    height: 250px;
+    width: 400px;
+    border-radius: 10px;
+}
+
+.rzadek {
+    display: inline-flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 20px;
+    padding: 10px;
+    margin: 10px;
+    border: 5px solid green;
+    border-radius: 13px;
+    box-shadow: 13px 13px 29px rgba(0, 0, 0, 0.4); /* Poprawione rgba */
+    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out; /* Zmienione na box-shadow, bo to animujesz */
+}
+
+.rzadek:hover {
+    transform: scale(1.1);
+    box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.7);
+}
+
+.prst {
+    display: inline-flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px;
+}
+
+.szcz {
+    display: inline-flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px;
+}
+
+.rowna {
+    height: 250px;
+    width: 400px;
+    border-radius: 10px;
+}
+
+.dodatek {
+    display: inline-flex;
+    align-items: center;
+    flex-direction: column;
+    border: 5px solid green;
+    border-radius: 13px;
+    padding: 10px; /* Dodajmy mu trochę paddingu, żeby tekst nie dotykał ramki */
+    margin: 10px;
+    box-shadow: 13px 13px 29px rgba(0, 0, 0, 0.4); /* Poprawione rgba */
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
-.miecz1:hover {
-    box-shadow: 20px 20px 40px rgba(0,0,0,0.6);
-    
-    /* Zmieńmy scale na 1.5 – teraz nie da się tego przegapić! */
-    transform: rotate(45deg) scale(1.5); 
+.dodatek:hover {
+    transform: scale(1.1); /* Zmniejszyłem z 1.5 na 1.1, przy 1.5 kafelek byłby gigantyczny i zasłoniłby resztę! */
+    box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.7);
 }
+.zdjfrk{
+   width: 200px;
+   height: auto;
+   border-radius: 15px;
+}
+.fraktale{
+display: inline-flex;
+align-items: center;
+flex-direction: column;
+border: 5px solid green;
+border-radius: 15px;
+margin: 10px;
+padding: 10px;
+box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.7);
+transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+.fraktale:hover{
+   transform: scale(1.2);
+   box-shadow: 30px 30px 50px rgba(0, 0, 0, 0.9);
+}
+.sfm{
+    width: 250px;
+    height: 200px;
+    border-radius: 13px;
+}
+.sofizmaty{
+    display: inline-flex;
+    align-items: center;
+    flex-direction: column;
+    border: 5px solid green;
+    border-radius: 13px;
+    box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.7);
+    transition: transform     0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    margin: 10px;
+    padding: 10px;
+}
+.sofizmaty:hover{
+    transform: scale(1.2);
+    box-shadow: 30px 30px 45px rgba(0,0,0,0.9);
+}
+
