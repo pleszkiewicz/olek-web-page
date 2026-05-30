@@ -1,20 +1,122 @@
 
+/* ======================================================= */
+/* 🌍 OGÓLNE USTAWIENIA STRONY                             */
+/* ======================================================= */
 body {
     background-color: aquamarine;
+    margin: 0;
+    padding: 0;
 }
 
-.figury {
-    height: 250px;
-    width: 400px;
-    border-radius: 10px;
+/* Ukrywamy systemowy kwadracik checkboxa */
+.kod-hamburgera {
+    display: none;
 }
 
-.bryly {
-    height: 250px;
-    width: 400px;
-    border-radius: 10px;
+/* ======================================================= */
+/* 🍔 IKONA HAMBURGERA W LEWYM GÓRNYM ROGU                 */
+/* ======================================================= */
+.ikona-hamburgera {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 20px;
+    cursor: pointer;
+    z-index: 100; /* Gwarancja, że ikonka zawsze będzie na wierzchu */
+    
+    /* Przypinamy ikonkę w rożku ekranu */
+    position: fixed; 
+    top: 20px;    
+    left: 20px;   
+    
+    /* Odpychanie elementów poniżej, gdy menu jest wyłączone */
+    margin-bottom: 40px;
 }
 
+/* Trzy białe kreski hamburgera */
+.ikona-hamburgera span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background-color: white;
+    border-radius: 3px;
+}
+
+/* ======================================================= */
+/* 📐 PIONOWY PANEL BOCZNY (ZAKTUALIZOWANY)                 */
+/* ======================================================= */
+.linki-kontener {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 80px 0px 20px 0px; /* Szerokość paddingu bocznego na 0 na start */
+    
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0px; /* Na start panel ma zero szerokości, czyli jest niewidzialny */
+    height: 100vh;
+    background-color: #1a1a1a;
+    box-shadow: none;
+    overflow: hidden; /* Ukrywa linki, kiedy menu jest zamknięte */
+    
+    transition: width 0.3s ease-in-out, padding 0.3s ease-in-out; 
+}
+
+/* Wygląd linków wewnątrz panelu */
+.link-menu {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 5px;
+    text-align: left;
+    transition: background-color 0.2s;
+}
+
+.link-menu:hover {
+    background-color: purple;
+}
+
+/* Kiedy menu jest otwarte: panel płynnie dostaje 250px szerokości i cień */
+.kod-hamburgera:checked + .ikona-hamburgera + .linki-kontener {
+    width: 250px;
+    padding: 80px 20px 20px 20px;
+    box-shadow: 5px 0px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* ======================================================= */
+/* 🔥 UNIWERSALNE ODPYCHANIE STRONY I PODSTRONY            */
+/* ======================================================= */
+
+/* Dodajemy płynność ruchu dla wszystkich głównych sekcji na obu stronach */
+.rzadek, .dodatek, .fraktale, .sofizmaty, .tresc-podstrony, div {
+    transition: transform 0.3s ease-in-out, margin-left 0.3s ease-in-out;
+}
+
+/* GŁÓWNA REGUŁA: Jeśli checkbox jest kliknięty, przesuń CAŁĄ zawartość 
+   strony głównej oraz podstrony (w tym ogólny div podstrony) w prawo o 250px! */
+.kod-hamburgera:checked ~ .tresc-podstrony,
+.kod-hamburgera:checked ~ .rzadek,
+.kod-hamburgera:checked ~ .dodatek,
+.kod-hamburgera:checked ~ .fraktale,
+.kod-hamburgera:checked ~ .sofizmaty,
+.kod-hamburgera:checked ~ div {
+    transform: translateX(250px);
+}
+
+/* Wyjątek: Sam panel boczny nie może się przesuwać w prawo przez regułę 'div' */
+.kod-hamburgera:checked ~ .linki-kontener {
+    transform: translateX(0px);
+}
+
+/* ======================================================= */
+/* 🎨 STYLIZACJA KAFELKÓW MATEMATYCZNYCH                   */
+/* ======================================================= */
+
+/* KAFELEK: Figury i Bryły (Rządek) */
 .rzadek {
     display: inline-flex;
     align-items: center;
@@ -22,17 +124,19 @@ body {
     gap: 20px;
     padding: 10px;
     margin: 10px;
+    margin-left: 50px; 
     border: 5px solid green;
     border-radius: 13px;
-    box-shadow: 13px 13px 29px rgba(0, 0, 0, 0.4); /* Poprawione rgba */
-    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out; /* Zmienione na box-shadow, bo to animujesz */
+    box-shadow: 13px 13px 29px rgba(0, 0, 0, 0.4);
+    transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out; 
 }
 
 .rzadek:hover {
-    transform: scale(1.1);
+    transform: scale(1.1) translateX(0px); /* Blokujemy interferencję hovera z transformacją menu */
     box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.7);
 }
 
+/* Wnętrze kafelka figury */
 .prst {
     display: inline-flex;
     align-items: center;
@@ -41,6 +145,13 @@ body {
     margin: 10px;
 }
 
+.figury {
+    height: 250px;
+    width: 400px;
+    border-radius: 10px;
+}
+
+/* Wnętrze kafelka bryły */
 .szcz {
     display: inline-flex;
     align-items: center;
@@ -49,66 +160,93 @@ body {
     margin: 10px;
 }
 
-.rowna {
+.bryly {
     height: 250px;
     width: 400px;
     border-radius: 10px;
 }
 
+/* KAFELEK: Równania liniowe (Dodatek) */
 .dodatek {
     display: inline-flex;
     align-items: center;
     flex-direction: column;
     border: 5px solid green;
     border-radius: 13px;
-    padding: 10px; /* Dodajmy mu trochę paddingu, żeby tekst nie dotykał ramki */
+    padding: 10px; 
     margin: 10px;
-    box-shadow: 13px 13px 29px rgba(0, 0, 0, 0.4); /* Poprawione rgba */
+    box-shadow: 13px 13px 29px rgba(0, 0, 0, 0.4); 
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 .dodatek:hover {
-    transform: scale(1.1); /* Zmniejszyłem z 1.5 na 1.1, przy 1.5 kafelek byłby gigantyczny i zasłoniłby resztę! */
+    transform: scale(1.1); 
     box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.7);
 }
-.zdjfrk{
-   width: 250px;
-   height: auto;
-   border-radius: 15px;
-}
-.fraktale{
-display: inline-flex;
-align-items: center;
-flex-direction: column;
-border: 5px solid green;
-border-radius: 15px;
-margin: 10px;
-padding: 10px;
-box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.7);
-transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-}
-.fraktale:hover{
-   transform: scale(1.2);
-   box-shadow: 30px 30px 50px rgba(0, 0, 0, 0.9);
-}
-.sfm{
-    width: 260xpx;
+
+.rowna {
     height: 250px;
-    border-radius: 13px;
+    width: 400px;
+    border-radius: 10px;
 }
-.sofizmaty{
+
+/* KAFELEK: Fraktale */
+.fraktale {
+    display: inline-flex;
+    align-items: center;
+    flex-direction: column;
+    border: 5px solid green;
+    border-radius: 15px;
+    margin: 10px;
+    padding: 10px;
+    margin-left: 50px;
+    box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.7);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.fraktale:hover {
+    transform: scale(1.2);
+    box-shadow: 30px 30px 50px rgba(0, 0, 0, 0.9);
+}
+
+.zdjfrk {
+    width: 250px;
+    height: auto;
+    border-radius: 15px;
+}
+
+/* KAFELEK: Sofizmaty */
+.sofizmaty {
     display: inline-flex;
     align-items: center;
     flex-direction: column;
     border: 5px solid green;
     border-radius: 13px;
     box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.7);
-    transition: transform     0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     margin: 10px;
     padding: 10px;
 }
-.sofizmaty:hover{
+
+.sofizmaty:hover {
     transform: scale(1.2);
-    box-shadow: 30px 30px 45px rgba(0,0,0,0.9);
+    box-shadow: 30px 30px 45px rgba(0, 0, 0, 0.9);
 }
 
+.sfm {
+    width: 260px; 
+    height: 250px;
+    border-radius: 13px;
+}
+
+/* Styl dla tekstu na podstronie */
+.tresc-podstrony {
+    padding: 20px;
+    margin-left: 50px;
+}
+.napis{
+    margin-left: 60px;
+    margin-top: 30px;
+    font-size: 40px;
+    font-style: italic;
+}
