@@ -283,8 +283,33 @@ body {
         background-color: aquamarine; /* Płynny powrót */
     }
 }
-.tytol{
+.tytul{
     font-size: 40px;
     font-family: Arial, Helvetica, sans-serif;
     margin-left: 500px;
+}
+.piesek{
+    height: 200px;
+    width: auto;
+    border-radius: 20px;
+    margin: 30px;
+    transition: all 0.5s;
+
+}
+.piesek:hover{
+    animation: magiarona 8s ease-in-out;
+}
+@keyframes magiarona{
+    0%{
+        filter: hue-rotate(0deg) blur(0px) sepia(0);
+        opacity: 1;
+    }
+    50%{
+        filter: hue-rotate(180deg) blur(5px) sepia(1);
+        opacity: 0.5;
+    }
+    100%{
+        filter: hue-rotate(360deg) blur(0px) sepia(0.5);
+        opacity: 1;
+    }
 }
