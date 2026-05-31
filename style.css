@@ -5,7 +5,7 @@
 /* ======================================================= */
 body {
     /* 1. KOLOR WYJŚCIOWY I ANIMACJA */
-    background-color: aquamarine;
+   background-color:lightblue;
     /* Nazwa scenariusza | Czas trwania (12 sekund, żeby było powoli i kojąco) | Płynność | Nieskończenie */
     animation: plynneTloRona 12s ease-in-out;
 
@@ -65,6 +65,7 @@ body {
     flex-direction: column;
     gap: 20px;
     padding: 80px 0px 20px 0px; /* Szerokość paddingu bocznego na 0 na start */
+    
     
     position: fixed;
     top: 0;
@@ -147,7 +148,7 @@ body {
 
 .rzadek:hover {
     transform: scale(1.1) translateX(0px); /* Blokujemy interferencję hovera z transformacją menu */
-    box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.7);
+    box-shadow: 0px 0px 30px #00ffcc;
 }
 
 /* Wnętrze kafelka figury */
@@ -195,7 +196,7 @@ body {
 
 .dodatek:hover {
     transform: scale(1.1); 
-    box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.7);
+   box-shadow: 0px 0px 30px #00ffcc;
 }
 
 .rowna {
@@ -220,7 +221,7 @@ body {
 
 .fraktale:hover {
     transform: scale(1.2);
-    box-shadow: 30px 30px 50px rgba(0, 0, 0, 0.9);
+   box-shadow: 0px 0px 30px #00ffcc;
 }
 
 .zdjfrk {
@@ -244,7 +245,7 @@ body {
 
 .sofizmaty:hover {
     transform: scale(1.2);
-    box-shadow: 30px 30px 45px rgba(0, 0, 0, 0.9);
+    box-shadow: 0px 0px 30px #00ffcc;
 }
 
 .sfm {
@@ -260,7 +261,7 @@ body {
 }
 
 /* Nowa klasa dodana przez Rona */
-.napis {
+.napit {
     margin-left: 60px;
     margin-top: 30px;
     font-size: 40px;
@@ -271,7 +272,7 @@ body {
 /* ======================================================= */
 @keyframes plynneTloRona {
     0% {
-        background-color: aquamarine;
+        background-color: lightblue;
     }
     33% {
         background-color: #20b2aa; /* Jasny morski */
@@ -280,7 +281,7 @@ body {
         background-color: #00bfff; /* Głęboki błękit */
     }
     100% {
-        background-color: aquamarine; /* Płynny powrót */
+        background-color: lightblue; /* Płynny powrót */
     }
 }
 .tytul{
@@ -291,10 +292,9 @@ body {
 .piesek{
     height: 200px;
     width: auto;
-    border-radius: 20px;
     margin: 30px;
     transition: all 0.5s;
-
+   border-radius: 13px;
 }
 .piesek:hover{
     animation: magiarona 8s ease-in-out;
@@ -312,4 +312,28 @@ body {
         filter: hue-rotate(360deg) saturate(100%);
         opacity: 1;
     }
+}
+.kot {
+    height: 300px;
+    width: 400px;
+    margin: 30px;
+    background: rgba(255, 255, 255, 0.2); 
+    backdrop-filter: blur(10px); 
+    border: 1px solid rgba(255, 255, 255, 0.4); 
+    border-radius: 13px;
+    
+    /* 🔥 DODAJEMY TE LINIJKI TYLKO DO TESTU: */
+}
+.kot:hover {
+    backdrop-filter: blur(15px); /* Po najechaniu mgła gęstnieje! */
+}
+.krolik{
+    height: 250px;
+    width: auto;
+    border-radius: 13px;
+
+}
+.napis{
+    font-size: 16px;
+    text-align: center;
 }
