@@ -36,22 +36,32 @@ obrazekPieska.addEventListener('click', () =>  {
 const nowyParagraf = document.createElement('p'); 
 
 // 2. Wlewamy "wodę" (tekst) do tej konkretnej szklanki
-nowyParagraf.textContent = "Królik uciekł!";
+nowyParagraf.textContent = "Krolik uciekl!";
 document.body.appendChild(nowyParagraf);
 
-const nowyPrzycisk = document.createElement('button');
+const glownyPrzycisk = document.querySelector('.przy');
 const srodekStrony = document.querySelector('.animals');
-
-przycisk.addEventListener('click', () => {
+glownyPrzycisk.addEventListener('click', () =>{
     const nowyPrzycisk = document.createElement('button');
-nowyPrzycisk.textContent = "Przejdź do Wikipedii";
-nowyPrzycisk.classList.add('batonikbuttonik');
+    nowyPrzycisk.textContent = "klinij mnie";
+    srodekStrony.appendChild(nowyPrzycisk)
+    nowyPrzycisk.classList.add('moj-button')
+})
 
-// 2. 🔥 Dodajemy nasłuchiwanie na NOWY przycisk!
-nowyPrzycisk.addEventListener('click', () => {
-    window.location.href = 'https://pl.wikipedia.org';
-});
+const przyciskWyczysc = document.querySelector('.btn-clear');
+const ikonaKoszyka = document.querySelector('.cart-icon');
+przyciskWyczysc.addEventListener('click', () => {
+ if (ikonaKoszyka.style.display === "none"){
+    ikonaKoszyka.style.display = "block"
+    nowyNapis.style.display = "none"
+} else {
+    ikonaKoszyka.style.display = "none"
+    
+}
+ const nowyNapis = document.createElement('h1');
+nowyNapis.textContent = "koszyk zniknal";
 
-// 3. Wrzucamy gotowy przycisk na środek strony
-srodekStrony.appendChild(nowyPrzycisk);
+
+document.body.appendChild(nowyNapis);
+   
 })

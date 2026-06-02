@@ -361,12 +361,8 @@ body {
     border-radius: 75%;
     background-color: bisque;
 }
-.batonikbuttonik{
-    background-color: blueviolet;
-    height: 40px;
-    width: 150px;
-    border: solid 1px burlywood;
-    border-radius: 20px;
-    color: #333333;
+.moj-button{
+    margin: 20px;
+    background-color: darkkhaki;
+    border-radius: 6px;
 }
-
