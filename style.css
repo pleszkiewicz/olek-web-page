@@ -289,80 +289,98 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     margin-left: 500px;
 }
-.piesek{
-    height: 200px;
-    width: auto;
-    margin: 30px;
-    transition: all 0.5s;
-   border-radius: 13px;
-}
-.piesek:hover{
-    animation: magiarona 8s ease-in-out;
-}
-@keyframes magiarona{
-    0%{
-        filter: hue-rotate(0deg) saturate(100%);
-        opacity: 1;
-    }
-    50%{
-        filter: hue-rotate(180deg) saturate(300%);
-        opacity: 0.5;
-    }
-    100%{
-        filter: hue-rotate(360deg) saturate(100%);
-        opacity: 1;
-    }
-}
-.kot {
-    height: 300px;
-    width: 400px;
-    margin: 30px;
-    background: rgba(255, 255, 255, 0.2); 
-    backdrop-filter: blur(10px); 
-    border: 1px solid rgba(255, 255, 255, 0.4); 
-    border-radius: 13px;
-    
-    /* 🔥 DODAJEMY TE LINIJKI TYLKO DO TESTU: */
-}
-.kot:hover {
-    backdrop-filter: blur(15px); /* Po najechaniu mgła gęstnieje! */
-}
-.krolik{
-    height: 250px;
-    width: auto;
-    border-radius: 13px;
 
-}
-.napis{
-    font-size: 16px;
-    text-align: center;
-}
-.prz{
-    margin-left: 30px;
-    border-radius: 50%;
-}
-.animals{
-    display: inline-flex;
-    flex-direction: row;
-    align-items: center;
-    border: solid 3px red;
-    border-radius: 5px;
-    margin: 30px;
-    padding: 20px;
-}
 .lody{
     height: 200px;
     width: auto;
-    border-radius: 13px;
-}
-.przy{
-    height: 30px;
-    width: 30px;
-    border-radius: 75%;
-    background-color: bisque;
-}
-.moj-button{
+    border-radius: 30px;
     margin: 20px;
-    background-color: darkkhaki;
-    border-radius: 6px;
 }
+.kot{
+    height: 200px;
+    width: auto;
+    border-radius: 30px;
+    margin: 20px;
+    
+}
+.kot:hover{
+    animation: whr 6s ease-in-out;
+}
+
+@keyframes whr {
+    0% {
+        /* Punkt początkowy: Mały i bez filtrów */
+        transform: scale(1);
+        filter: hue-rotate(0deg) sepia(0);
+    }
+    
+    50% {
+        /* PŁYNNY SZCZYT w połowie czasu: Największy i najwięcej filtrów */
+        transform: scale(1.2);
+        filter: hue-rotate(180deg) sepia(0.8);
+    }
+    
+    100% {
+        /* PŁYNNY POWRÓT na start: Przeglądarka wie, jak tu dojść, bo zna drogę powrotną */
+        transform: scale(1);
+        filter: hue-rotate(360deg) sepia(0);
+    }
+}
+
+.input-password{
+    margin: 10px;
+    border-radius: 5px;
+}
+.komunikat-sukces {
+    color: limegreen;
+    font-weight: bold;
+}
+.komunikat-sukces {
+    color: red;
+    font-weight: bold;
+}
+.lista-ceny{
+    border: solid snow 3px;
+    margin: 20px;
+    padding: 5px;
+    display: inline-flex;
+    border-radius: 10px;
+}
+
+.lista-cen{
+    border: solid snow 3px;
+    margin: 20px;
+    padding: 5px;
+    display: inline-flex;
+    border-radius: 10px;
+}
+.trzylisty{
+    display: inline-flex;
+}
+.sklepRona{
+    border: dotted red 2px;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 5px;
+    display: inline-flex;
+}
+.bananybla{
+    border-radius: 10px;
+    margin: 10px;
+    
+}
+.zamknij{
+    border-radius: 4px;
+    background-color: greenyellow;
+    height: 20px;
+    margin-top: 100px;
+    
+}
+.bananyniebla{
+    display: inline-flex;
+    border: solid yellow;
+    padding: 5px;
+    margin: 10px;
+    border-radius: 10px;
+}
+

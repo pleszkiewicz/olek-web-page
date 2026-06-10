@@ -1,67 +1,85 @@
+const nap = document.querySelector('.napis1');
+const napi = document.querySelector('.napis2');
+nap.style.color = "red";
+nap.style.backgoundColor = "green";
+nap.style.fontSize = "30px";
 
 
-const obrazekKota = document.querySelector('.kot');
-const obrazekKrolika = document.querySelector('.krolik');
-const textNapisu = document.querySelector('.napis');
+const przyciskWejdz = document.querySelector('.btn-enter');
+const poleHaslo = document.querySelector('.input-password');
 
-// --- 2. AKCJA: UCIECZKA KRÓLIKA ---
-obrazekKrolika.addEventListener('click', () => {
-    textNapisu.textContent = "Królik uciekł!";
-    obrazekKrolika.style.display = "none"; // Królik znika
-});
+// 🔥 TUTAJ SĄ TWOJE NOWE ZMIENNE:
+const napis1 = document.querySelector('.komunikat-sukces');
+const napis2 = document.querySelector('.komunikat-blad');
 
-// --- 3. AKCJA: MAGIA KOTA (NOWOŚĆ) ---
-obrazekKota.addEventListener('click', () => {
-    textNapisu.textContent = "Kot wyczarował królika!";
+const sprawdzHaslo = () => {
+    const wpisaneHaslo = poleHaslo.value;
     
-    // 🔥 Przywracamy królika na ekran!
-    obrazekKrolika.style.display = "block"; 
+    if (wpisaneHaslo === "tajne123") {
+        napis1.style.display = "block"
+        napis2.style.display = "none"
+        
+    } else {
+        napis1.style.display = "none"
+        napis2.style.display = "block"
+        
+        
+    }
+};
 
-    
+przyciskWejdz.addEventListener('click', sprawdzHaslo);
+window.addEventListener('keydown', (e) => {
+    if (e.key === "Enter") { sprawdzHaslo(); }
 });
-const obrazekPieska = document.querySelector('.piesek');
-obrazekPieska.addEventListener('click', () =>  {
-    textNapisu.textContent = "emm..., co slychac?";
-    alert("bum");
-    obrazekKota.style.display = "none";
-    obrazekKrolika.style.display = "none";
+
+
+
+const zbanowani = ["Jan", "Marta", "Bumbum"];
+const kontenerListy = document.querySelector('.lista-banow');
+zbanowani.forEach((imie) => {
+    kontenerListy.innerHTML += "Użytkownik " + imie + " ma bana!<br>";
 });
-    const przycisk = document.querySelector('.prz');
-    przycisk.addEventListener('click', () => {
-        obrazekKota.style.display = "block";
-        obrazekKrolika.style.display = "block";
+const ceny = [20, 50, 10, 120];
+const kontenerCen = document.querySelector('.lista-cen');
+ceny.forEach((jednacena) => {
+    if (jednacena > 40){
+        kontenerCen.innerHTML += "produkt" + " "  + jednacena + "zł(Drogi!) <br>";
+    } else {
+        kontenerCen.innerHTML += "produkt" + " " + jednacena + "zł(Tani!) <br>";
+    }
+})
+const kontenerCeny = document.querySelector('.lista-ceny');
+const sklep = [
+    { nazwa: "Buty", cena: 120 },
+    { nazwa: "Czapka", cena: 30 },
+    { nazwa: "Koszulka", cena: 50 }
+];
+sklep.forEach((pojedynczyProdukt) => {
+    // Łączymy tekst z właściwościami obiektu za pomocą plusów:
+
+    kontenerCeny.innerHTML += "Produkt: " + pojedynczyProdukt.nazwa + " - Cena: " + pojedynczyProdukt.cena + " zł<br>";
+});
+const kontenerRona = document.querySelector('.sklepRona');
+    const owoce = [
+        {nazwa: "banan", cena: 30},
+        {nazwa: "jablko", cena: 20},
+        {nazwa: "arbuz", cena: 50},
+    ];
+    owoce.forEach((pojedynczyOwoc) => {
+        kontenerRona.innerHTML += "Owoc: " + pojedynczyOwoc.nazwa + ",cena:" + pojedynczyOwoc.cena + "zł<br>";
+    });
+
+    const przyciskzs = document.querySelector('.zamknij');
+    const calyBaner = document.querySelector('.bananybla');
+    przyciskzs.addEventListener('click', () => {
+        if (calyBaner.style.display === "none"){
+            calyBaner.style.display = "block"
+    } else {
+        calyBaner.style.display = "none"
+    }
+     
+
         
     })
-    // 1. Tworzymy "szklankę" (pudełko na tekst)
-const nowyParagraf = document.createElement('p'); 
-
-// 2. Wlewamy "wodę" (tekst) do tej konkretnej szklanki
-nowyParagraf.textContent = "Krolik uciekl!";
-document.body.appendChild(nowyParagraf);
-
-const glownyPrzycisk = document.querySelector('.przy');
-const srodekStrony = document.querySelector('.animals');
-glownyPrzycisk.addEventListener('click', () =>{
-    const nowyPrzycisk = document.createElement('button');
-    nowyPrzycisk.textContent = "klinij mnie";
-    srodekStrony.appendChild(nowyPrzycisk)
-    nowyPrzycisk.classList.add('moj-button')
-})
-
-const przyciskWyczysc = document.querySelector('.btn-clear');
-const ikonaKoszyka = document.querySelector('.cart-icon');
-przyciskWyczysc.addEventListener('click', () => {
- if (ikonaKoszyka.style.display === "none"){
-    ikonaKoszyka.style.display = "block"
-    nowyNapis.style.display = "none"
-} else {
-    ikonaKoszyka.style.display = "none"
     
-}
- const nowyNapis = document.createElement('h1');
-nowyNapis.textContent = "koszyk zniknal";
-
-
-document.body.appendChild(nowyNapis);
-   
-})
+    
