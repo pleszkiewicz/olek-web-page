@@ -384,3 +384,10 @@ body {
     border-radius: 10px;
 }
 
+.alert{
+    border: solid red 2px;
+    display: inline-flex;
+    border-radius: 20px;
+    padding: 5px;
+    margin: 10px;
+}

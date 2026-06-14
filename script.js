@@ -43,7 +43,7 @@ const ceny = [20, 50, 10, 120];
 const kontenerCen = document.querySelector('.lista-cen');
 ceny.forEach((jednacena) => {
     if (jednacena > 40){
-        kontenerCen.innerHTML += "produkt" + " "  + jednacena + "zł(Drogi!) <br>";
+        kontenerCen.innerHTML += `produkt ${jednacena} zł (drogi!)<br>`
     } else {
         kontenerCen.innerHTML += "produkt" + " " + jednacena + "zł(Tani!) <br>";
     }
@@ -81,5 +81,43 @@ const kontenerRona = document.querySelector('.sklepRona');
 
         
     })
-    
-    
+
+    const nowyParagraf = document.createElement("p");
+
+// 2. Dodajemy do niego tekst
+nowyParagraf.textContent = "Uwaga! To jest ważne powiadomienie.";
+nowyParagraf.classList.add("alert")
+document.body.appendChild(nowyParagraf)
+const kontenerImiona = document.querySelector('.imionabla');
+const imiona = ["jan", "marta", "aneczka"];
+
+// Dla każdego imienia: weź literę na pozycji 0, powiększ ją i doklej resztę od pozycji 1
+const poprawneImiona = imiona.map(imie => imie[0].toUpperCase() + imie.slice(1));
+    poprawneImiona.forEach((pojimie) => {
+        kontenerImiona.innerHTML += `imie na wielka litere ${pojimie} <br>`
+    })
+const kontenerWynikow = document.querySelector('.tablica-wynikow');
+const punktyRunda1 = [10, 50, 100];
+const podwpkt = punktyRunda1.map(x => x * 2);
+podwpkt.forEach((pojpkt) => {
+    kontenerWynikow.innerHTML += `nowy wynik: ${pojpkt}<br>`
+})
+
+const kontenerTanie = document.querySelector('.tanie-produkty');
+const ceny1 = [15, 80, 25, 120, 10, 200];
+
+const newtablica = ceny1.filter(newceny =>  newceny <= 40)
+
+newtablica.forEach((tanieceny) => {
+    kontenerTanie.innerHTML += `tanie ceny: ${tanieceny}<br>`
+})
+const kontenerPromocji = document.querySelector('.super-promki');
+const cenyEuro = [10, 30, 50, 5];
+const drogieZlotowki = cenyEuro
+    .filter(cena => cena > 20)
+    .map(cena => cena * 4);
+
+// 2. I od razu wrzucamy te piękne ceny w PLN na stronę!
+drogieZlotowki.forEach((cenaPLN) => {
+    kontenerPromocji.innerHTML += `Produkt premium kosztuje: ${cenaPLN} zł<br>`;
+});
