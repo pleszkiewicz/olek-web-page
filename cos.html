@@ -1,0 +1,1361 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morska Cisza: Przystań Rybaka</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow: hidden;
+            background-color: #0c151d;
+        }
+        h1, .serif-font {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Stylizacja przytulnego, drewnianego interfejsu */
+        .cozy-panel {
+            background: rgba(24, 20, 17, 0.9);
+            backdrop-filter: blur(8px);
+            border: 2px solid #5c4033;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+        .wood-border {
+            border-color: #8b5a2b;
+        }
+        /* Płynne animacje dla UI */
+        .transition-all-300 {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 🍔 STYLE HAMBURGERA (Przeniesione z Twojego style.css, żeby działało nad Canvasem) */
+        .panel-stron {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 50; /* Wybija menu nad grę 3D */
+            pointer-events: auto;
+        }
+        .kod-hamburgera {
+            display: none;
+        }
+        .ikona-hamburgera {
+            display: flex;
+            flex-direction: column;
+            width: 30px;
+            cursor: pointer;
+            gap: 6px;
+        }
+        .ikona-hamburgera span {
+            background: #f59e0b; /* Piękny złoty kolor pasujący do gry */
+            height: 4px;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+        .linki-kontener {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 40px;
+            background: rgba(24, 20, 17, 0.95);
+            border: 2px solid #5c4033;
+            border-radius: 8px;
+            padding: 10px;
+            
+        }
+        .link-menu {
+            display: block;
+            color: #fefbeb;
+            padding: 8px 15px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .link-menu:hover {
+            background: #5c4033;
+            border-radius: 4px;
+        }
+        /* Rozwijanie menu po kliknięciu checkboxa */
+        .kod-hamburgera:checked ~ .linki-kontener {
+            display: block;
+        }
+    </style>
+</head>
+<body class="w-full h-screen relative">
+
+<nav class="panel-stron">
+    <input type="checkbox" id="menu-toggle" class="kod-hamburgera">
+    
+    <label for="menu-toggle" class="ikona-hamburgera">
+        <span></span>
+        <span></span>
+        <span></span>
+    </label>
+    
+    <div class="linki-kontener">
+        <a href="index.html" class="link-menu">🏠 Strona Główna</a>
+        <a href="podstrona.html" class="link-menu">info</a>
+        <a href="cwiczenia.html" class="link-menu">cwiczenia</a>
+        <a href="cos.html" class="link-menu"> gra </a>
+    </div>
+
+</nav>
+
+<div id="hud-container" class="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-4 md:p-6 opacity-0 transition-opacity duration-1000">
+    
+    <div class="w-full flex justify-between items-start pointer-events-auto pr-16"> <div class="cozy-panel text-amber-100 rounded-xl p-4 flex gap-6 items-center">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">🪙</span>
+                <div>
+                    <p class="text-[10px] uppercase tracking-wider text-amber-500 font-bold">Monety</p>
+                    <p id="hud-gold" class="text-xl font-black text-amber-300">0</p>
+                </div>
+            </div>
+            <div class="w-[2px] h-8 bg-amber-900/30"></div>
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">🐟</span>
+                <div>
+                    <p class="text-[10px] uppercase tracking-wider text-amber-500 font-bold">Ładownia</p>
+                    <p id="hud-cargo" class="text-xl font-black text-amber-100">0 / 4</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cozy-panel text-amber-100 rounded-xl p-4 text-center flex flex-col items-center min-w-[120px]">
+            <p class="text-[9px] uppercase tracking-wider text-amber-500 font-bold mb-1">Siła Wiatru</p>
+            <div class="flex items-center justify-center gap-2">
+                <span id="wind-arrow" class="text-xl font-black text-amber-400 inline-block transition-transform duration-300">⬆</span>
+                <span id="wind-speed" class="text-md font-bold">Wiatr: Średni</span>
+            </div>
+            <p class="text-[9px] text-amber-300/60 mt-1">Płyń z wiatrem, aby przyspieszyć!</p>
+        </div>
+    </div>
+
+    <div class="w-full flex flex-col items-center justify-center gap-4 pointer-events-none">
+        <div id="action-prompt" class="cozy-panel text-amber-200 px-6 py-3 rounded-full text-center text-sm font-bold border-amber-800 animate-pulse hidden pointer-events-auto cursor-pointer">
+            Naciśnij <kbd class="px-2 py-0.5 bg-amber-950 rounded border border-amber-700 text-xs text-amber-100">SPACJĘ</kbd> lub kliknij tutaj, aby Zarzucić Wędkę!
+        </div>
+        <div id="notification" class="cozy-panel text-amber-100 px-6 py-3 rounded-xl text-center font-medium opacity-0 transition-all-300 transform translate-y-2 max-w-md pointer-events-auto">
+            Witaj rybaku!
+        </div>
+    </div>
+
+    <div class="w-full flex justify-between items-end">
+        <div class="hidden md:block cozy-panel text-amber-200/90 rounded-xl p-4 text-xs max-w-xs space-y-1.5">
+            <p class="font-bold text-amber-400 uppercase text-[10px] mb-1 tracking-wider">Sterowanie Łodzią:</p>
+            <p><kbd class="px-1.5 py-0.5 bg-amber-950 rounded">W</kbd> <kbd class="px-1.5 py-0.5 bg-amber-950 rounded">S</kbd> - Rozwiń / Zwiń Żagle</p>
+            <p><kbd class="px-1.5 py-0.5 bg-amber-950 rounded">A</kbd> <kbd class="px-1.5 py-0.5 bg-amber-950 rounded">D</kbd> - Sterowanie Sterem (Skręt)</p>
+            <p><kbd class="px-1.5 py-0.5 bg-amber-950 rounded">SPACJA</kbd> - Zarzucenie / Zwijanie wędki</p>
+            <p class="text-amber-500 font-medium pt-1">💡 Szukaj spienionych kręgów wody, by znaleźć ryby. Dobibij do molo z latarnią, by sprzedać ryby i kupić ulepszenia.</p>
+        </div>
+
+        <div class="flex md:hidden gap-4 items-center justify-between w-full pointer-events-auto">
+            <div class="flex gap-2">
+                <button id="btn-left" class="w-12 h-12 rounded-lg bg-amber-900/80 border border-amber-700 text-amber-100 flex items-center justify-center font-bold active:bg-amber-700 touch-none">◀</button>
+                <div class="flex flex-col gap-2">
+                    <button id="btn-forward" class="w-12 h-12 rounded-lg bg-amber-900/80 border border-amber-700 text-amber-100 flex items-center justify-center font-bold active:bg-amber-700 touch-none">▲</button>
+                    <button id="btn-backward" class="w-12 h-12 rounded-lg bg-amber-900/80 border border-amber-700 text-amber-100 flex items-center justify-center font-bold active:bg-amber-700 touch-none">▼</button>
+                </div>
+                <button id="btn-right" class="w-12 h-12 rounded-lg bg-amber-900/80 border border-amber-700 text-amber-100 flex items-center justify-center font-bold active:bg-amber-700 touch-none">▶</button>
+            </div>
+            
+            <button id="btn-action" class="px-6 h-14 rounded-xl bg-amber-700 border-2 border-amber-500 text-amber-50 font-extrabold text-sm shadow-md active:bg-amber-500 touch-none uppercase tracking-wider">Zarzuć Wędkę</button>
+        </div>
+    </div>
+</div>
+
+<div id="fishing-game" class="absolute inset-x-0 bottom-32 mx-auto z-20 w-80 cozy-panel rounded-2xl p-4 hidden flex-col items-center">
+    <p class="text-xs font-bold text-amber-400 uppercase tracking-widest mb-1">WALKA Z RYBĄ!</p>
+    <p class="text-[10px] text-amber-200/70 text-center mb-3">Trzymaj wskaźnik w zielonej strefie naciskając SPACJĘ lub przycisk!</p>
+    
+    <div class="w-full h-2.5 bg-stone-900 rounded-full overflow-hidden border border-amber-950 mb-4">
+        <div id="catch-progress" class="h-full bg-emerald-500 transition-all duration-100" style="width: 0%"></div>
+    </div>
+
+    <div class="w-full h-10 bg-stone-950 rounded-lg relative overflow-hidden border border-amber-900 flex items-center">
+        <div id="safe-zone" class="absolute h-full bg-emerald-500/30 border-l border-r border-emerald-400" style="left: 35%; width: 30%"></div>
+        <div id="tension-pointer" class="absolute w-2.5 h-full bg-amber-400 border border-amber-100 shadow rounded-sm transition-all duration-75" style="left: 50%"></div>
+    </div>
+    
+    <button id="btn-reel" class="w-full py-3 mt-4 bg-amber-700 hover:bg-amber-600 border border-amber-500 text-white rounded-xl text-xs font-black uppercase tracking-wider active:scale-95 transition-all-300">CIĄGNIJ (SPACJA)</button>
+</div>
+
+<div id="port-modal" class="absolute inset-0 z-20 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
+    <div class="cozy-panel text-amber-100 w-full max-w-xl rounded-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+        <button id="close-port" class="absolute top-4 right-4 text-amber-400 hover:text-amber-200 text-3xl font-light">&times;</button>
+        
+        <div class="text-center mb-6">
+            <h2 class="text-3xl font-bold text-amber-400 serif-font tracking-wide flex justify-center items-center gap-2">
+                ⛵ Przystań "Cicha Kotwica"
+            </h2>
+            <p class="text-xs text-amber-300/80 mt-1">Ukojenie dla zmęczonych żeglarzy i handlarzy morskich</p>
+        </div>
+
+        <div class="bg-amber-950/30 p-4 rounded-xl border border-amber-900/50 flex justify-between items-center mb-6">
+            <div>
+                <h3 class="font-bold text-amber-200 text-sm">Twoje połowy w ładowni</h3>
+                <p id="port-cargo-desc" class="text-xs text-amber-400/80 mt-1">Masz ryby gotowe na sprzedaż.</p>
+            </div>
+            <button id="sell-fish-btn" class="px-5 py-3 bg-amber-700 hover:bg-amber-600 border border-amber-500 text-white rounded-lg text-xs font-bold transition-all-300 shadow">
+                Sprzedaj Wszystko za <span id="fish-value-txt" class="text-amber-300 font-extrabold">0 🪙</span>
+            </button>
+        </div>
+
+        <p class="text-xs font-bold uppercase tracking-widest text-amber-500 mb-3">Tuning i Ulepszenia Łodzi</p>
+        
+        <div class="space-y-3">
+            <div class="bg-amber-950/40 p-3.5 rounded-xl border border-amber-900/40 flex justify-between items-center gap-3">
+                <div>
+                    <h4 class="font-bold text-sm text-amber-200">Królewskie Żagle (Szybkość)</h4>
+                    <p class="text-xs text-amber-400/70">Większa zwrotność i prędkość maksymalna łodzi.</p>
+                    <p class="text-[11px] text-stone-400 mt-1">Poziom: <span id="lvl-sails" class="text-amber-300 font-bold">1/4</span></p>
+                </div>
+                <button id="buy-sails" class="px-4 py-2 bg-amber-800 hover:bg-amber-700 border border-amber-600 rounded-lg text-xs font-bold transition flex flex-col items-center min-w-[100px]">
+                    <span>Ulepsz</span>
+                    <span class="text-[10px] text-amber-300 mt-0.5" id="cost-sails">50 🪙</span>
+                </button>
+            </div>
+
+            <div class="bg-amber-950/40 p-3.5 rounded-xl border border-amber-900/40 flex justify-between items-center gap-3">
+                <div>
+                    <h4 class="font-bold text-sm text-amber-200">Wędka z Kości Morskiej (Kontrola)</h4>
+                    <p class="text-xs text-amber-400/70">Zwiększa zieloną strefę bezpieczeństwa podczas zwijania.</p>
+                    <p class="text-[11px] text-stone-400 mt-1">Poziom: <span id="lvl-rod" class="text-amber-300 font-bold">1/4</span></p>
+                </div>
+                <button id="buy-rod" class="px-4 py-2 bg-amber-800 hover:bg-amber-700 border border-amber-600 rounded-lg text-xs font-bold transition flex flex-col items-center min-w-[100px]">
+                    <span>Ulepsz</span>
+                    <span class="text-[10px] text-amber-300 mt-0.5" id="cost-rod">40 🪙</span>
+                </button>
+            </div>
+
+            <div class="bg-amber-950/40 p-3.5 rounded-xl border border-amber-900/40 flex justify-between items-center gap-3">
+                <div>
+                    <h4 class="font-bold text-sm text-amber-200">Latarnia Naftowa (Szczęście)</h4>
+                    <p class="text-xs text-amber-400/70">Ciepłe światło wabi rzadsze i droższe okazy ryb.</p>
+                    <p class="text-[11px] text-stone-400 mt-1">Poziom: <span id="lvl-lantern" class="text-amber-300 font-bold">1/4</span></p>
+                </div>
+                <button id="buy-lantern" class="px-4 py-2 bg-amber-800 hover:bg-amber-700 border border-amber-600 rounded-lg text-xs font-bold transition flex flex-col items-center min-w-[100px]">
+                    <span>Ulepsz</span>
+                    <span class="text-[10px] text-amber-300 mt-0.5" id="cost-lantern">60 🪙</span>
+                </button>
+            </div>
+
+            <div class="bg-amber-950/40 p-3.5 rounded-xl border border-amber-900/40 flex justify-between items-center gap-3">
+                <div>
+                    <h4 class="font-bold text-sm text-amber-200">Dębowa Ładownia (Pojemność)</h4>
+                    <p class="text-xs text-amber-400/70">Pozwala przewozić więcej złowionych ryb jednocześnie.</p>
+                    <p class="text-[11px] text-stone-400 mt-1">Poziom: <span id="lvl-cargo" class="text-amber-300 font-bold">1/4</span></p>
+                </div>
+                <button id="buy-cargo" class="px-4 py-2 bg-amber-800 hover:bg-amber-700 border border-amber-600 rounded-lg text-xs font-bold transition flex flex-col items-center min-w-[100px]">
+                    <span>Ulepsz</span>
+                    <span class="text-[10px] text-amber-300 mt-0.5" id="cost-cargo">30 🪙</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="intro-overlay" class="absolute inset-0 z-30 bg-[#070b0f] flex flex-col items-center justify-center p-6 text-center">
+    <div class="max-w-md cozy-panel rounded-2xl p-8 space-y-6">
+        <div>
+            <h1 class="text-4xl font-extrabold text-amber-400 tracking-wide serif-font">MORSKA CISZA</h1>
+            <p class="text-[10px] text-amber-500 uppercase tracking-[0.2em] font-bold">Przystań Rybaka 3D</p>
+        </div>
+        
+        <p class="text-sm text-amber-100/90 leading-relaxed font-light">
+            Wypłyń na spokojne, ale nieprzewidywalne trójwymiarowe morze. Naucz się panować nad wiatrem, łów rzadkie gatunki ryb w spienionych toniach i wracaj do przytulnego portu, by udoskonalać swoją żaglówkę. 
+        </p>
+
+        <div class="text-left bg-stone-950/80 p-4 rounded-xl border border-amber-900 text-xs text-amber-200 space-y-2">
+            <p class="font-bold text-amber-400 text-[10px] uppercase tracking-wider mb-1">Twoje Rybackie Rzemiosło:</p>
+            <p>⛵ <strong>Żegluj:</strong> Klawisze WASD regulują żagiel i kierunek płynięcia względem wiatru.</p>
+            <p>🌊 <strong>Fale 3D:</strong> Twoja łódź fizycznie kołysze się na wodzie.</p>
+            <p>🎣 <strong>Łów:</strong> Zbliż się do ławic i wciśnij SPACJĘ. Uważaj na napięcie wędki!</p>
+            <p>⚓ <strong>Handluj:</strong> Sprzedawaj ryby na oświetlonym pomoście portowym.</p>
+        </div>
+
+        <button id="start-game-btn" class="w-full py-4 bg-amber-600 hover:bg-amber-500 text-stone-950 font-black rounded-xl shadow-lg hover:shadow-amber-900/20 active:scale-95 transition text-md tracking-wider uppercase">
+            Rozpocznij Rejs
+        </button>
+    </div>
+</div>
+
+<canvas id="game-canvas" class="w-full h-full block"></canvas>
+
+<script>
+// (Cały Twój niezmieniony kod silnika gry Three.js pozostaje tutaj i działa bez zmian!)
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(type) {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    
+    if (type === 'splash') {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.4);
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
+    } else if (type === 'click') {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.02);
+        gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+    } else if (type === 'bite') {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.15);
+        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
+    } else if (type === 'gold') {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'fanfare') {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.2);
+        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
+    }
+}
+
+// Stan gry
+const gameState = {
+    gold: 20,
+    cargo: [],
+    upgrades: {
+        sails: 1,
+        rod: 1,
+        lantern: 1,
+        cargo: 1
+    },
+    isSailing: true,
+    isFishing: false, // flaga czy wędka jest zarzucona
+    fishingState: 'idle', // 'idle', 'waiting', 'reeling', 'catching'
+    nearPort: false,
+    inPortMenu: false,
+    activeFishGroup: null, // Ławica, przy której aktualnie stoimy
+};
+
+// Zbalansowane parametry ulepszeń
+const upgradeSpecs = {
+    sails: {
+        costs: [0, 40, 90, 150],
+        vals: [0, 0.4, 0.55, 0.7, 0.85] // Prędkości łodzi
+    },
+    rod: {
+        costs: [0, 30, 70, 120],
+        vals: [0, 0.25, 0.35, 0.45, 0.55] // Szerokość bezpiecznej strefy napięcia w %
+    },
+    lantern: {
+        costs: [0, 50, 100, 180],
+        vals: [0, 1.0, 1.5, 2.0, 2.5] // Szansa na unikalne ryby i zasięg światła
+    },
+    cargo: {
+        costs: [0, 25, 60, 110],
+        vals: [0, 3, 5, 8, 12] // Maksymalna pojemność ładowni
+    }
+};
+
+// Rodzaje ryb do złowienia
+const fishDatabase = [
+    { name: "Płotka Słoneczna", price: 8, r: 0.8, color: 0xeab308 },
+    { name: "Srebrzysta Belona", price: 15, r: 0.5, color: 0x94a3b8 },
+    { name: "Miedziany Pstrąg", price: 28, r: 0.3, color: 0xd97706 },
+    { name: "Złoty Karaś", price: 50, r: 0.15, color: 0xf59e0b },
+    { name: "Smaragdowy Głębinowiec", price: 95, r: 0.05, color: 0x10b981 }
+];
+
+// Zmienne 3D
+let scene, camera, renderer;
+let waterPlane, waterGeometry;
+let boat, mastLantern;
+let portIsland;
+let fishGroups = [];
+let keys = {};
+let clock = new THREE.Clock();
+
+// Kierunek wiatru i siła
+let windAngle = Math.random() * Math.PI * 2;
+let windSpeed = 0.12;
+
+function init3D() {
+    const canvas = document.getElementById('game-canvas');
+    scene = new THREE.Scene();
+    
+    // Ciepły nastrojowy zachód słońca
+    scene.background = new THREE.Color(0x131f2b); 
+    scene.fog = new THREE.FogExp2(0x131f2b, 0.005);
+
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    // Światło otoczenia (głęboki, morski błękit)
+    const ambientLight = new THREE.AmbientLight(0x1e3a5f, 0.5);
+    scene.add(ambientLight);
+
+    // Ciepłe słońce tuż nad horyzontem
+    const sunLight = new THREE.DirectionalLight(0xfeb47b, 1.8);
+    sunLight.position.set(-150, 15, -100);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.camera.near = 0.5;
+    sunLight.shadow.camera.far = 400;
+    const d = 150;
+    sunLight.shadow.camera.left = -d;
+    sunLight.shadow.camera.right = d;
+    sunLight.shadow.camera.top = d;
+    sunLight.shadow.camera.bottom = -d;
+    scene.add(sunLight);
+
+    // Dynamiczna tafla wody (Morze)
+    const waterSize = 600;
+    const segments = 120;
+    waterGeometry = new THREE.PlaneGeometry(waterSize, waterSize, segments, segments);
+    
+    // Dodajemy właściwości fal do wierzchołków
+    const pos = waterGeometry.attributes.position;
+    waterGeometry.originalY = [];
+    for(let i = 0; i < pos.count; i++) {
+        waterGeometry.originalY.push(pos.getZ(i)); // W płaszczyźnie 2D Z to pionowa wysokość fal przed obróceniem
+    }
+
+    const waterMaterial = new THREE.MeshStandardMaterial({
+        color: 0x0f2a4a,
+        roughness: 0.15,
+        metalness: 0.8,
+        flatShading: true // Efekt low-poly
+    });
+    
+    waterPlane = new THREE.Mesh(waterGeometry, waterMaterial);
+    waterPlane.rotation.x = -Math.PI / 2;
+    waterPlane.receiveShadow = true;
+    scene.add(waterPlane);
+
+    // Budowanie Świata
+    createPortIsland();
+    createPlayerBoat();
+    createFishSchools();
+    updateWindHUD();
+
+    window.addEventListener('resize', onWindowResize);
+}
+
+function getWaveHeight(x, z, time) {
+    // Kombinacja sinusoid z różnymi kierunkami i częstotliwościami dla naturalnego wyglądu wody
+    const wave1 = Math.sin(x * 0.08 + time * 1.2) * Math.cos(z * 0.08 + time * 1.2) * 1.2;
+    const wave2 = Math.cos(x * 0.03 - time * 0.8) * Math.sin(z * 0.04 + time * 0.6) * 2.0;
+    const wave3 = Math.sin(x * 0.15 + time * 2.0) * 0.3; // Drobne fale
+    return wave1 + wave2 + wave3;
+}
+
+function updateWater(time) {
+    const pos = waterGeometry.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+        // Woda jest obrócona o 90 stopni, więc lokalny X i Y odpowiadają współrzędnym świata X, Z
+        const x = pos.getX(i);
+        const y = pos.getY(i);
+        const zValue = getWaveHeight(x, -y, time);
+        pos.setZ(i, zValue);
+    }
+    waterGeometry.computeVertexNormals();
+    waterGeometry.attributes.position.needsUpdate = true;
+}
+
+function createPortIsland() {
+    portIsland = new THREE.Group();
+    portIsland.position.set(0, -2, 0);
+
+    // Główna wyspa skalna portu
+    const islandGeo = new THREE.CylinderGeometry(28, 34, 10, 10, 3);
+    const islandMat = new THREE.MeshStandardMaterial({
+        color: 0x2c2621,
+        roughness: 0.9,
+        flatShading: true
+    });
+    const rock = new THREE.Mesh(islandGeo, islandMat);
+    rock.castShadow = true;
+    rock.receiveShadow = true;
+    portIsland.add(rock);
+
+    // Zielona warstwa wyspy
+    const grassGeo = new THREE.CylinderGeometry(28.5, 28, 2, 10);
+    const grassMat = new THREE.MeshStandardMaterial({
+        color: 0x3b5323,
+        roughness: 0.8,
+        flatShading: true
+    });
+    const grass = new THREE.Mesh(grassGeo, grassMat);
+    grass.position.y = 5.5;
+    grass.receiveShadow = true;
+    portIsland.add(grass);
+
+    // Drewniane Molo Rybackie (Port)
+    const pier = new THREE.Group();
+    pier.position.set(0, 4.5, 28);
+    
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.9, flatShading: true });
+    
+    // Główny pokład pomostu
+    const deck = new THREE.Mesh(new THREE.BoxGeometry(10, 1, 16), woodMat);
+    deck.position.z = 2;
+    deck.castShadow = true;
+    deck.receiveShadow = true;
+    pier.add(deck);
+
+    // Słupy molo zanurzone w wodzie
+    const pillarGeo = new THREE.CylinderGeometry(0.8, 0.8, 12, 5);
+    for (let i = -1; i <= 1; i += 2) {
+        for (let j = 0; j <= 1; j++) {
+            const pillar = new THREE.Mesh(pillarGeo, woodMat);
+            pillar.position.set(i * 4.2, -5.5, j * 8 + 2);
+            pillar.castShadow = true;
+            pier.add(pillar);
+        }
+    }
+    
+    portIsland.add(pier);
+
+    // Chatka Rybaka na wyspie
+    const cabin = new THREE.Group();
+    cabin.position.set(0, 8.5, -5);
+    
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x705335, roughness: 0.8 });
+    const roofMat = new THREE.MeshStandardMaterial({ color: 0x8b3a2b, roughness: 0.7, flatShading: true });
+    
+    const walls = new THREE.Mesh(new THREE.BoxGeometry(12, 6, 9), wallMat);
+    walls.castShadow = true;
+    cabin.add(walls);
+
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(8, 4, 4), roofMat);
+    roof.position.y = 5;
+    roof.rotation.y = Math.PI / 4;
+    roof.castShadow = true;
+    cabin.add(roof);
+
+    portIsland.add(cabin);
+
+    // Latarnia portowa emitująca ciepłe, pomarańczowe światło
+    const lighthouse = new THREE.Group();
+    lighthouse.position.set(4, 5, 34); // Na samym końcu molo
+    
+    const ironMat = new THREE.MeshStandardMaterial({ color: 0x33251a, metalness: 0.5 });
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 8), ironMat);
+    post.position.y = 4;
+    post.castShadow = true;
+    lighthouse.add(post);
+
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.8, 6, 6), new THREE.MeshBasicMaterial({ color: 0xffaa44 }));
+    bulb.position.y = 8;
+    lighthouse.add(bulb);
+
+    const cap = new THREE.Mesh(new THREE.ConeGeometry(1.2, 1, 6), ironMat);
+    cap.position.y = 8.7;
+    lighthouse.add(cap);
+
+    // Ciepłe światło portowe kierujące łódki do przystani
+    const portLight = new THREE.PointLight(0xffaa44, 2, 45, 0.5);
+    portLight.position.set(0, 8, 0);
+    lighthouse.add(portLight);
+
+    portIsland.add(lighthouse);
+    scene.add(portIsland);
+}
+
+function createPlayerBoat() {
+    boat = new THREE.Group();
+    boat.position.set(0, 0, 75); // Zaczynamy niedaleko molo
+
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x7c4f35, roughness: 0.8, flatShading: true });
+    const ironMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.6, metalness: 0.5 });
+
+    // Kadłub łodzi
+    const hullGeo = new THREE.CylinderGeometry(2.5, 1.8, 10, 6, 3);
+    const hull = new THREE.Mesh(hullGeo, woodMat);
+    hull.rotation.x = Math.PI / 2;
+    hull.scale.set(1.1, 0.7, 1); // Spłaszczenie łódki dla stabilności wizualnej
+    hull.castShadow = true;
+    hull.receiveShadow = true;
+    boat.add(hull);
+
+    // Ostry dziób łodzi
+    const bowGeo = new THREE.ConeGeometry(2.5, 4, 6);
+    const bow = new THREE.Mesh(bowGeo, woodMat);
+    bow.position.set(0, 0, 6);
+    bow.rotation.x = Math.PI / 2;
+    bow.scale.set(1.1, 1, 0.7);
+    bow.castShadow = true;
+    boat.add(bow);
+
+    // Pokład wewnętrzny
+    const deckMat = new THREE.MeshStandardMaterial({ color: 0x55321f, roughness: 0.9 });
+    const deck = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.2, 8), deckMat);
+    deck.position.set(0, 0.4, 0);
+    deck.receiveShadow = true;
+    boat.add(deck);
+
+    // Maszt drewniany
+    const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.25, 12, 5), woodMat);
+    mast.position.set(0, 6, 1);
+    mast.castShadow = true;
+    boat.add(mast);
+
+    // Ciepła naftowa latarnia kołysząca się na maszcie
+    mastLantern = new THREE.Group();
+    mastLantern.position.set(0, 9, 2.2);
+
+    const lanternFrame = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.9, 0.6), ironMat);
+    mastLantern.add(lanternFrame);
+
+    const lanternGlow = new THREE.Mesh(new THREE.SphereGeometry(0.3, 5, 5), new THREE.MeshBasicMaterial({ color: 0xffd175 }));
+    lanternGlow.position.y = -0.1;
+    mastLantern.add(lanternGlow);
+
+    const lanternLight = new THREE.PointLight(0xffd175, 1.5, 25, 0.5);
+    lanternLight.position.set(0, 0, 0);
+    mastLantern.add(lanternLight);
+
+    boat.add(mastLantern);
+
+    // Trójkątny żagiel (Biało-kremowy materiał płócienny)
+    const sailMat = new THREE.MeshStandardMaterial({ color: 0xfefbeb, roughness: 1, side: THREE.DoubleSide });
+    const sailShape = new THREE.Shape();
+    sailShape.moveTo(0, 0);
+    sailShape.lineTo(0, 8);
+    sailShape.lineTo(-4, 1.5);
+    sailShape.lineTo(0, 0);
+
+    const sailGeo = new THREE.ShapeGeometry(sailShape);
+    const sail = new THREE.Mesh(sailGeo, sailMat);
+    sail.position.set(0, 2.5, 1);
+    sail.rotation.y = -0.2; // Delikatny kąt łapania wiatru
+    boat.add(sail);
+
+    // Spławik i wędka na rufie
+    const rodPost = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 4), ironMat);
+    rodPost.position.set(1.2, 1.5, -3.5);
+    rodPost.rotation.set(-0.6, 0, 0.5);
+    boat.add(rodPost);
+
+    scene.add(boat);
+}
+
+function createFishSchools() {
+    // 5 stałych miejsc, w których gromadzą się ryby
+    const spots = [
+        { x: -50, z: 90, color: 0xeab308 },
+        { x: 75, z: -80, color: 0x94a3b8 },
+        { x: -110, z: -70, color: 0xd97706 },
+        { x: 120, z: 50, color: 0xf59e0b },
+        { x: -30, z: -120, color: 0x10b981 }
+    ];
+
+    spots.forEach((spot, index) => {
+        const schoolGroup = new THREE.Group();
+        schoolGroup.position.set(spot.x, 0, spot.z);
+
+        // Efekt pluskania na wodzie - biały spieniony pierścień
+        const ringGeo = new THREE.RingGeometry(5, 5.5, 16);
+        const ringMat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.6,
+            side: THREE.DoubleSide
+        });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.rotation.x = -Math.PI / 2;
+        ring.position.y = 0.05;
+        schoolGroup.add(ring);
+
+        // Małe rybki wyskakujące z wody w okręgu
+        const fishGeo = new THREE.ConeGeometry(0.3, 1, 4);
+        const fishMat = new THREE.MeshStandardMaterial({ color: spot.color, roughness: 0.3 });
+        
+        schoolGroup.fishes = [];
+        for (let i = 0; i < 4; i++) {
+            const fish = new THREE.Mesh(fishGeo, fishMat);
+            const angle = (Math.PI / 2) * i;
+            fish.position.set(Math.cos(angle) * 3, -1, Math.sin(angle) * 3);
+            fish.rotation.z = Math.PI / 2;
+            schoolGroup.add(fish);
+            
+            schoolGroup.fishes.push({
+                mesh: fish,
+                angle: angle,
+                speed: 1 + Math.random() * 2,
+                jumpTimer: Math.random() * Math.PI * 2
+            });
+        }
+
+        scene.add(schoolGroup);
+        fishGroups.push({
+            mesh: schoolGroup,
+            x: spot.x,
+            z: spot.z,
+            color: spot.color,
+            id: index
+        });
+    });
+}
+
+const boatPhysics = {
+    speed: 0,
+    angle: Math.PI, // Kierunek patrzenia łodzi
+    rudder: 0, // Kąt skrętu
+    targetY: 0,
+    pitch: 0,
+    roll: 0
+};
+
+function updateBoatPhysics(delta) {
+    if (gameState.inPortMenu) return;
+
+    // Pobieranie wejść klawiaturowych lub przycisków mobilnych
+    let forwardInput = 0;
+    let turnInput = 0;
+
+    if (keys['w'] || keys['arrowup'] || mobileControls.forward) forwardInput = 1;
+    if (keys['s'] || keys['arrowdown'] || mobileControls.backward) forwardInput = -0.5;
+    if (keys['a'] || keys['arrowleft'] || mobileControls.left) turnInput = 1;
+    if (keys['d'] || keys['arrowright'] || mobileControls.right) turnInput = -1;
+
+    // Prędkość maksymalna zależy od poziomu żagli i wpływu wiatru
+    const sailBonus = upgradeSpecs.sails.vals[gameState.upgrades.sails];
+    
+    // Obliczanie wektora wiatru względem kierunku płynięcia łodzi
+    // Płynięcie zgodnie z wiatrem = bonus do prędkości, pod wiatr = opór
+    const boatDirX = Math.sin(boatPhysics.angle);
+    const boatDirZ = Math.cos(boatPhysics.angle);
+    const windDirX = Math.sin(windAngle);
+    const windDirZ = Math.cos(windAngle);
+    
+    const windAlignment = (boatDirX * windDirX + boatDirZ * windDirZ); // Dot product (-1 do 1)
+    const windEffect = 1 + windAlignment * 0.4; // max +40% prędkości z wiatrem, -40% pod wiatr
+
+    const maxSpeed = sailBonus * windEffect;
+
+    // Rozwijanie / Zwijanie żagli (prędkość z inercją)
+    if (forwardInput !== 0) {
+        boatPhysics.speed = THREE.MathUtils.lerp(boatPhysics.speed, forwardInput * maxSpeed, 0.05);
+    } else {
+        // Opór wody
+        boatPhysics.speed = THREE.MathUtils.lerp(boatPhysics.speed, 0, 0.02);
+    }
+
+    // Sterowanie płetwą sterową
+    if (turnInput !== 0) {
+        boatPhysics.angle += turnInput * 0.022;
+    }
+    boat.rotation.y = boatPhysics.angle;
+
+    // Przesunięcie łodzi w przestrzeni
+    boat.position.x += Math.sin(boatPhysics.angle) * boatPhysics.speed;
+    boat.position.z += Math.cos(boatPhysics.angle) * boatPhysics.speed;
+
+    // FLOATING PHYSICS: Próbkowanie fal dla uzyskania idealnego unoszenia i kołysania na wodzie
+    const time = clock.getElapsedTime();
+    const bx = boat.position.x;
+    const bz = boat.position.z;
+
+    // Samplujemy wysokość fali pod środkiem łodzi, dziobem i burtą
+    const heightCenter = getWaveHeight(bx, bz, time);
+    const heightBow = getWaveHeight(bx + Math.sin(boatPhysics.angle) * 4, bz + Math.cos(boatPhysics.angle) * 4, time);
+    const heightSide = getWaveHeight(bx + Math.sin(boatPhysics.angle + Math.PI/2) * 2, bz + Math.cos(boatPhysics.angle + Math.PI/2) * 2, time);
+
+    // Wysokość Y (płynny pionowy lerp z falą)
+    boat.position.y = THREE.MathUtils.lerp(boat.position.y, heightCenter + 0.3, 0.1);
+
+    // Pochylenie przód-tył (Pitch) na fali
+    const targetPitch = (heightBow - heightCenter) * 0.12;
+    boatPhysics.pitch = THREE.MathUtils.lerp(boatPhysics.pitch, targetPitch, 0.1);
+    boat.rotation.x = boatPhysics.pitch;
+
+    // Kołysanie na boki (Roll) pod wpływem fali oraz pędu zakręcania
+    const targetRoll = (heightSide - heightCenter) * 0.18 + (turnInput * boatPhysics.speed * 0.1);
+    boatPhysics.roll = THREE.MathUtils.lerp(boatPhysics.roll, targetRoll, 0.1);
+    boat.rotation.z = boatPhysics.roll;
+
+    // Kołysanie latarni na maszcie (niezależna, fizyczna bezwładność wiszącej lampionu)
+    mastLantern.rotation.z = Math.sin(time * 3.0) * 0.15;
+    mastLantern.rotation.x = Math.cos(time * 2.5) * 0.1;
+}
+
+// State machine rybołówstwa
+const fishingSystem = {
+    bobber: null,
+    fishBiteTimer: 0,
+    tension: 50,
+    progress: 0,
+    targetTension: 50,
+    biteTriggered: false,
+
+    cast: function() {
+        if (gameState.cargo.length >= upgradeSpecs.cargo.vals[gameState.upgrades.cargo]) {
+            showNotification("Ładownia pełna! Sprzedaj ryby w porcie.");
+            return;
+        }
+
+        gameState.isSailing = false;
+        gameState.isFishing = true;
+        this.progress = 0;
+        this.tension = 50;
+        this.biteTriggered = false;
+
+        // Wizualna kreacja spławika w wodzie przed łodzią
+        const bobberGeo = new THREE.SphereGeometry(0.4, 5, 5);
+        const bobberMat = new THREE.MeshBasicMaterial({ color: 0xff3333 });
+        this.bobber = new THREE.Mesh(bobberGeo, bobberMat);
+        
+        // Wyznaczamy pozycję spławika w odległości 8 metrów od burty
+        const angle = boatPhysics.angle;
+        this.bobber.position.set(
+            boat.position.x + Math.sin(angle + 0.5) * 10,
+            boat.position.y,
+            boat.position.z + Math.cos(angle + 0.5) * 10
+        );
+        scene.add(this.bobber);
+
+        playSound('splash');
+        showNotification("Zarzucono wędkę! Czekaj na plusk wody...");
+        gameState.fishingState = 'waiting';
+
+        // Losowy czas oczekiwania na branie
+        this.fishBiteTimer = 2.0 + Math.random() * 4.0;
+        
+        // Zmień tekst przycisku akcji na mobile
+        document.getElementById('btn-action').innerText = "Czekaj...";
+        document.getElementById('action-prompt').classList.add('hidden');
+    },
+
+    update: function(delta) {
+        if (!gameState.isFishing) return;
+
+        const time = clock.getElapsedTime();
+
+        // Spławik dryfuje na powierzchni wody razem z falami
+        if (this.bobber) {
+            const h = getWaveHeight(this.bobber.position.x, this.bobber.position.z, time);
+            this.bobber.position.y = h;
+            
+            // Lekko drga na falach
+            if (gameState.fishingState === 'waiting') {
+                this.bobber.position.y += Math.sin(time * 8) * 0.05;
+            }
+        }
+
+        // 1. OCZEKIWANIE NA BRANIE
+        if (gameState.fishingState === 'waiting') {
+            this.fishBiteTimer -= delta;
+            if (this.fishBiteTimer <= 0 && !this.biteTriggered) {
+                this.biteTriggered = true;
+                gameState.fishingState = 'biting';
+                playSound('bite');
+                showNotification("Zacięcie! Ryba bierze! WCISKAJ SPACJĘ!");
+                document.getElementById('btn-action').innerText = "ZETNIJ RYBĘ";
+                
+                // Wizualne zanurzenie spławika głęboko w wodzie
+                if (this.bobber) {
+                    this.bobber.position.y -= 1.8;
+                }
+            }
+        }
+
+        // 2. WALKA Z RYBĄ (MINIGRA)
+        if (gameState.fishingState === 'reeling') {
+            // Napięcie spada samoistnie, gracz musi kontrować wciskaniem spacji
+            let inputActive = keys[' '] || mobileControls.action || keys['enter'];
+            
+            // Symulacja szarpania ryby (losowe zmiany pożądanej wartości)
+            this.targetTension += (Math.random() - 0.5) * 200 * delta;
+            this.targetTension = Math.max(10, Math.min(this.targetTension, 90));
+
+            // Zmiany napięcia pod wpływem akcji gracza
+            if (inputActive) {
+                this.tension = THREE.MathUtils.lerp(this.tension, this.tension + 45 * delta, 0.4);
+                if (Math.random() < 0.3) playSound('click'); // Kliknięcie bębna
+            } else {
+                this.tension = THREE.MathUtils.lerp(this.tension, this.tension - 30 * delta, 0.4);
+            }
+
+            // Ograniczenia napięcia
+            this.tension = Math.max(0, Math.min(this.tension, 100));
+
+            // Aktualizacja UI walki
+            document.getElementById('tension-pointer').style.left = `${this.tension}%`;
+
+            // Sprawdzanie czy napięcie mieści się w bezpiecznej zielonej strefie
+            // Rozmiar strefy jest zależny od poziomu ulepszenia wędki
+            const rodUpgrade = upgradeSpecs.rod.vals[gameState.upgrades.rod];
+            const halfZone = (rodUpgrade * 100) / 2;
+            const zoneLeft = this.targetTension - halfZone;
+            const zoneRight = this.targetTension + halfZone;
+
+            // Wyświetlenie bezpiecznej strefy na pasku
+            const safeZoneEl = document.getElementById('safe-zone');
+            safeZoneEl.style.left = `${Math.max(0, zoneLeft)}%`;
+            safeZoneEl.style.width = `${Math.min(100, zoneRight) - Math.max(0, zoneLeft)}%`;
+
+            if (this.tension >= zoneLeft && this.tension <= zoneRight) {
+                // Sukces: Postęp rośnie
+                this.progress += 16 * delta;
+                safeZoneEl.classList.remove('bg-emerald-500/30');
+                safeZoneEl.classList.add('bg-emerald-400/55');
+            } else {
+                // Porażka: Postęp spada
+                this.progress -= 8 * delta;
+                safeZoneEl.classList.remove('bg-emerald-400/55');
+                safeZoneEl.classList.add('bg-red-500/40');
+            }
+
+            this.progress = Math.max(0, this.progress);
+            document.getElementById('catch-progress').style.width = `${this.progress}%`;
+
+            // KRYTERIA WYGRANEJ / PRZEGRANEJ
+            if (this.progress >= 100) {
+                this.catchFish();
+            } else if (this.tension <= 3 || this.tension >= 97) {
+                this.loseFish("Żyłka pękła! Ryba uciekła.");
+            }
+        }
+    },
+
+    triggerReel: function() {
+        // Kliknięcie w odpowiednim momencie inicjuje minigrę
+        if (gameState.fishingState === 'biting') {
+            gameState.fishingState = 'reeling';
+            document.getElementById('fishing-game').classList.remove('hidden');
+            document.getElementById('fishing-game').classList.add('flex');
+            document.getElementById('btn-action').innerText = "Trzymaj!";
+        }
+    },
+
+    catchFish: function() {
+        // Wybieranie gatunku ryby na bazie szczęścia (ulepszenie latarni)
+        const luckBonus = upgradeSpecs.lantern.vals[gameState.upgrades.lantern];
+        let randomVal = Math.random() / luckBonus;
+        
+        let selectedFish = fishDatabase[0]; // Domyślnie płotka
+        for (let i = fishDatabase.length - 1; i >= 0; i--) {
+            if (randomVal <= fishDatabase[i].r) {
+                selectedFish = fishDatabase[i];
+                break;
+            }
+        }
+
+        // Dodanie ryby do ładowni
+        gameState.cargo.push(selectedFish);
+        playSound('fanfare');
+        showNotification(`Sukces! Złowiono: ${selectedFish.name} (${selectedFish.price} 🪙)`);
+        
+        this.reset();
+    },
+
+    loseFish: function(reason) {
+        showNotification(reason);
+        playSound('splash');
+        this.reset();
+    },
+
+    reset: function() {
+        if (this.bobber) {
+            scene.remove(this.bobber);
+            this.bobber = null;
+        }
+        gameState.isSailing = true;
+        gameState.isFishing = false;
+        gameState.fishingState = 'idle';
+        document.getElementById('fishing-game').classList.add('hidden');
+        document.getElementById('fishing-game').classList.remove('flex');
+        document.getElementById('btn-action').innerText = "Zarzuć Wędkę";
+        updateHUD();
+    }
+};
+
+// Monitor klawiszy
+window.addEventListener('keydown', (e) => {
+    const key = e.key.toLowerCase();
+    keys[key] = true;
+
+    // Spacja odpala zarzucanie lub walkę rybacką
+    if (key === ' ' || key === 'enter') {
+        e.preventDefault(); // Unikaj przewijania ekranu spacebarem
+        handleActionInput();
+    }
+});
+
+window.addEventListener('keyup', (e) => {
+    keys[e.key.toLowerCase()] = false;
+});
+
+// Zmienne sterowania mobilnego
+const mobileControls = {
+    forward: false,
+    backward: false,
+    left: false,
+    right: false,
+    action: false
+};
+
+// Mapowanie zdarzeń dotykowych na komórki
+function setupMobileControls() {
+    const attachTouch = (id, property) => {
+        const btn = document.getElementById(id);
+        btn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            mobileControls[property] = true;
+        });
+        btn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            mobileControls[property] = false;
+        });
+    };
+
+    attachTouch('btn-forward', 'forward');
+    attachTouch('btn-backward', 'backward');
+    attachTouch('btn-left', 'left');
+    attachTouch('btn-right', 'right');
+
+    const actionBtn = document.getElementById('btn-action');
+    actionBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        mobileControls.action = true;
+        handleActionInput();
+    });
+    actionBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        mobileControls.action = false;
+    });
+
+    // Przycisk zwijania minigry na ekranie telefonu
+    const reelBtn = document.getElementById('btn-reel');
+    reelBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        mobileControls.action = true;
+    });
+    reelBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        mobileControls.action = false;
+    });
+}
+
+function handleActionInput() {
+    if (!gameState.isFishing && gameState.isSailing) {
+        // Sprawdzamy czy gracz stoi w ławicy ryb
+        if (gameState.activeFishGroup !== null) {
+            fishingSystem.cast();
+        } else {
+            showNotification("Musisz zbliżyć się do spienionych kręgów wody (ławic ryb)!");
+        }
+    } else if (gameState.fishingState === 'biting') {
+        fishingSystem.triggerReel();
+    }
+}
+
+function checkProximities() {
+    // 1. Interakcja z Ławicami Ryb
+    let nearAnyFish = null;
+    fishGroups.forEach((school) => {
+        const dist = boat.position.distanceTo(school.mesh.position);
+        if (dist < 18) { // Promień wykrywania ryb
+            nearAnyFish = school;
+        }
+    });
+
+    gameState.activeFishGroup = nearAnyFish;
+
+    const actionPrompt = document.getElementById('action-prompt');
+    if (gameState.activeFishGroup && !gameState.isFishing) {
+        actionPrompt.classList.remove('hidden');
+        actionPrompt.innerText = "Naciśnij SPACJĘ, aby rozpocząć łowienie ryb!";
+    } else {
+        actionPrompt.classList.add('hidden');
+    }
+
+    // 2. Interakcja z Przystanią Portową (Wyspa jest na pozycji 0,0,0, molo na z:28)
+    const portCenter = new THREE.Vector3(0, 0, 24);
+    const distToPort = boat.position.distanceTo(portCenter);
+
+    if (distToPort < 26) {
+        if (!gameState.nearPort) {
+            gameState.nearPort = true;
+            openPortMenu();
+        }
+    } else {
+        if (gameState.nearPort) {
+            gameState.nearPort = false;
+            closePortMenu();
+        }
+    }
+}
+
+function openPortMenu() {
+    gameState.inPortMenu = true;
+    boatPhysics.speed = 0; // Zatrzymanie łodzi przy doku
+    document.getElementById('port-modal').classList.remove('hidden');
+    updatePortUI();
+}
+
+function closePortMenu() {
+    gameState.inPortMenu = false;
+    document.getElementById('port-modal').classList.add('hidden');
+    // Odpychamy lekko łódź, by mogła bezpiecznie odpłynąć
+    boat.position.z = 40;
+    showNotification("Wypłynięcie z portu! Pomyślnych wiatrów!");
+}
+
+document.getElementById('close-port').addEventListener('click', () => {
+    closePortMenu();
+});
+
+function updatePortUI() {
+    // Oblicz wartość ryb w ładowni
+    let totalValue = 0;
+    gameState.cargo.forEach(fish => {
+        totalValue += fish.price;
+    });
+
+    document.getElementById('fish-value-txt').innerText = `${totalValue} 🪙`;
+    
+    const cargoCount = gameState.cargo.length;
+    if (cargoCount > 0) {
+        document.getElementById('port-cargo-desc').innerText = `Masz w ładowni ${cargoCount} ryb gotowych do oprawienia i sprzedaży.`;
+        document.getElementById('sell-fish-btn').disabled = false;
+        document.getElementById('sell-fish-btn').className = "px-5 py-3 bg-amber-700 hover:bg-amber-600 border border-amber-500 text-white rounded-lg text-xs font-bold transition-all-300 shadow cursor-pointer";
+    } else {
+        document.getElementById('port-cargo-desc').innerText = "Twoja ładownia jest pusta. Wypłyń złowić coś ciekawego!";
+        document.getElementById('sell-fish-btn').disabled = true;
+        document.getElementById('sell-fish-btn').className = "px-5 py-3 bg-stone-800 border border-stone-700 text-stone-500 rounded-lg text-xs font-bold opacity-60 cursor-not-allowed";
+    }
+
+    // Odświeżenie przycisków ulepszeń
+    const refreshUpgradeBtn = (id, lvlSpan, costSpan, key) => {
+        const curLvl = gameState.upgrades[key];
+        const btn = document.getElementById(id);
+        const lvlTxt = document.getElementById(lvlSpan);
+        const costTxt = document.getElementById(costSpan);
+
+        if (curLvl >= 4) {
+            lvlTxt.innerText = "MAKS (Poziom 4)";
+            costTxt.innerText = "Wymaksowano";
+            btn.disabled = true;
+            btn.className = "px-4 py-2 bg-stone-800 text-stone-500 rounded-lg text-xs font-bold cursor-not-allowed opacity-60";
+        } else {
+            const nextCost = upgradeSpecs[key].costs[curLvl];
+            lvlTxt.innerText = `${curLvl}/4`;
+            costTxt.innerText = `${nextCost} 🪙`;
+            
+            if (gameState.gold >= nextCost) {
+                btn.disabled = false;
+                btn.className = "px-4 py-2 bg-amber-700 hover:bg-amber-600 border border-amber-500 text-white rounded-lg text-xs font-bold transition cursor-pointer";
+            } else {
+                btn.disabled = true;
+                btn.className = "px-4 py-2 bg-stone-800 text-stone-500 rounded-lg text-xs font-bold cursor-not-allowed opacity-60";
+            }
+        }
+    };
+
+    refreshUpgradeBtn('buy-sails', 'lvl-sails', 'cost-sails', 'sails');
+    refreshUpgradeBtn('buy-rod', 'lvl-rod', 'cost-rod', 'rod');
+    refreshUpgradeBtn('buy-lantern', 'lvl-lantern', 'cost-lantern', 'lantern');
+    refreshUpgradeBtn('buy-cargo', 'lvl-cargo', 'cost-cargo', 'cargo');
+}
+
+// Zakup ulepszeń w porcie
+function buyUpgrade(key) {
+    const curLvl = gameState.upgrades[key];
+    if (curLvl >= 4) return;
+
+    const cost = upgradeSpecs[key].costs[curLvl];
+    if (gameState.gold >= cost) {
+        gameState.gold -= cost;
+        gameState.upgrades[key]++;
+        playSound('gold');
+        showNotification("Pomyślnie zakupiono ulepszenie łodzi!");
+        updateHUD();
+        updatePortUI();
+    }
+}
+
+document.getElementById('buy-sails').addEventListener('click', () => buyUpgrade('sails'));
+document.getElementById('buy-rod').addEventListener('click', () => buyUpgrade('rod'));
+document.getElementById('buy-lantern').addEventListener('click', () => buyUpgrade('lantern'));
+document.getElementById('buy-cargo').addEventListener('click', () => buyUpgrade('cargo'));
+
+// Sprzedaż ryb
+document.getElementById('sell-fish-btn').addEventListener('click', () => {
+    if (gameState.cargo.length === 0) return;
+
+    let payout = 0;
+    gameState.cargo.forEach(fish => {
+        payout += fish.price;
+    });
+
+    gameState.gold += payout;
+    gameState.cargo = [];
+    playSound('gold');
+    showNotification(`Sprzedano ryby za sumę ${payout} 🪙!`);
+    updateHUD();
+    updatePortUI();
+});
+
+function updateHUD() {
+    document.getElementById('hud-gold').innerText = gameState.gold;
+    
+    const maxCargo = upgradeSpecs.cargo.vals[gameState.upgrades.cargo];
+    document.getElementById('hud-cargo').innerText = `${gameState.cargo.length} / ${maxCargo}`;
+}
+
+function updateWindHUD() {
+    // Aktualizujemy grafikę kierunku wiatru
+    const degrees = (windAngle * 180) / Math.PI;
+    document.getElementById('wind-arrow').style.transform = `rotate(${degrees}deg)`;
+}
+
+function showNotification(text) {
+    const notif = document.getElementById('notification');
+    notif.innerText = text;
+    notif.style.opacity = '1';
+    notif.style.transform = 'translateY(0)';
+    
+    setTimeout(() => {
+        notif.style.opacity = '0';
+        notif.style.transform = 'translateY(8px)';
+    }, 4500);
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    const delta = clock.getDelta();
+    const time = clock.getElapsedTime();
+
+    // 1. Aktualizacja animacji fal wodnych
+    updateWater(time);
+
+    // 2. Aktualizacja fizyki łodzi
+    updateBoatPhysics(delta);
+
+    // 3. Obsługa systemu minigry rybackiej
+    fishingSystem.update(delta);
+
+    // 4. Sprawdzanie odległości do portu i ryb
+    checkProximities();
+
+    // 5. Animowanie rybek pluskających w ławicach
+    fishGroups.forEach((school) => {
+        school.mesh.fishes.forEach((fish) => {
+            // Ruch obrotowy małych rybek wokół środka ławicy
+            fish.angle += delta * fish.speed * 0.4;
+            fish.mesh.position.x = Math.cos(fish.angle) * 3;
+            fish.mesh.position.z = Math.sin(fish.angle) * 3;
+            
+            // Efekt wyskakiwania nad wodę (sinusoidalny skok)
+            fish.jumpTimer += delta * 3;
+            const jumpHeight = Math.max(-1.5, Math.sin(fish.jumpTimer) * 1.5);
+            fish.mesh.position.y = jumpHeight;
+
+            // Kąt nachylenia ryby dopasowany do krzywej skoku
+            fish.mesh.rotation.y = -fish.angle + Math.PI/2;
+            fish.mesh.rotation.x = Math.cos(fish.jumpTimer) * 0.5;
+        });
+    });
+
+    // 6. Cykliczna, powolna zmiana kierunku wiatru (co kilkadziesiąt sekund)
+    if (Math.random() < 0.001) {
+        windAngle = Math.random() * Math.PI * 2;
+        updateWindHUD();
+    }
+
+    // 7. Dynamiczne śledzenie kamery za kołyszącą się łodzią rybacką
+    if (boat) {
+        if (!gameState.inPortMenu) {
+            // Kamera umieszczona idealnie za rufą łodzi, dając głęboki widok
+            const relativeCameraOffset = new THREE.Vector3(0, 12, -26);
+            const cameraOffset = relativeCameraOffset.applyMatrix4(boat.matrixWorld);
+
+            camera.position.lerp(cameraOffset, 0.07);
+            camera.lookAt(boat.position.clone().add(new THREE.Vector3(0, 2, 4)));
+        } else {
+            // Kamera dokująca - spokojny, malowniczy widok na przystań z lotu ptaka
+            const targetPortCam = new THREE.Vector3(26, 18, 55);
+            camera.position.lerp(targetPortCam, 0.04);
+            camera.lookAt(new THREE.Vector3(0, 2, 20));
+        }
+    }
+
+    renderer.render(scene, camera);
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// Inicjalizacja gry po kliknięciu start
+document.getElementById('start-game-btn').addEventListener('click', () => {
+    // Odblokowanie kontekstu Audio dla przeglądarek mobilnych
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    
+    document.getElementById('intro-overlay').style.display = 'none';
+    document.getElementById('hud-container').style.opacity = '1';
+    
+    init3D();
+    setupMobileControls();
+    animate();
+    
+    showNotification("Morze czeka! Znajdź pluskające ławice ryb i zarzuć wędkę.");
+});
+</script>
+</body>
+</html>

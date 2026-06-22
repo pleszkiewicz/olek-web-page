@@ -121,3 +121,138 @@ const drogieZlotowki = cenyEuro
 drogieZlotowki.forEach((cenaPLN) => {
     kontenerPromocji.innerHTML += `Produkt premium kosztuje: ${cenaPLN} zł<br>`;
 });
+
+const listaButow = document.querySelector('.promocja-buty');
+const sklepButy = [
+    { nazwa: "Nike Air", cena: 60 },
+    { nazwa: "Adidas Zap", cena: 20 },
+    { nazwa: "Puma Speed", cena: 100 },
+    { nazwa: "Trampki NoName", cena: 15 }
+];
+
+    const drogieButyPLN = sklepButy
+    .filter(but => but.cena > 40) // Zostawia tylko Nike i Pumę
+    .map(but => {
+        return {
+            nazwa: but.nazwa,
+            cenaPLN: but.cena * 4
+        };
+    });
+    drogieButyPLN.forEach((pojbut) => {
+        listaButow.innerHTML += `ten but premium "${pojbut.nazwa}" kosztuje ${pojbut.cenaPLN} zł<br>`
+    })
+    const kielbaski = document.querySelector('.baner-kielbaski');
+    kielbaski.style.display = "none";
+    setTimeout(() => {
+        kielbaski.style.display = "block";
+    }, 5000);
+
+  const calyLicznik = document.querySelector('.licznik'); 
+let czas = 10;
+const mojStoper = setInterval(() => {
+    czas = czas - 1;
+    // Dopóki odliczamy, musimy doklejać słowo "sekund!" plusami
+    calyLicznik.innerHTML = "Pozostało czasu: " + czas + " sekund!";
+    if (czas === 0) {
+        clearInterval(mojStoper);
+        // 2. Nadpisujemy CAŁY tekst jednym czystym komunikatem:
+        calyLicznik.innerHTML = "Koniec promocji!"; 
+    }
+}, 1000);
+
+const licznik2 = document.querySelector('.odliczanie');
+    let czas2 = 5;
+    const nowystoper = setInterval(() => {
+        
+        if (czas2 === 5){
+            licznik2.innerHTML = "pozostało " + czas2 + " sekund!"
+        } else if (czas2 >= 2 && czas2 <= 4){
+            licznik2.innerHTML = "pozostały " + czas2 + " sekundy!"
+        } else {
+            licznik2.innerHTML = "pozostała " + czas2 + " sekunda!"
+        }
+        czas2 = czas2 - 1;
+        if (czas2 === 0){
+        clearInterval(nowystoper);
+        licznik2.innerHTML += "Koniec promocji! idź do domu"; 
+        }
+    }, 1000); 
+    const stworzNapis = (nowyTekst) => {
+    const cenaa = document.querySelector('.klasa-masa');
+    cenaa.innerHTML += nowyTekst;
+};
+
+// 2. Wywołania testowe (to napisałeś super!)
+stworzNapis("kiełbaski są smaczne<br>");
+stworzNapis("banany na rany!");
+
+
+
+
+const parNiepar = document.querySelector('.sthsostrong');
+
+for (let i = 1; i <= 20; i++){
+    const nowaLina = document.createElement('p');
+
+    if (i % 2 === 0){
+        nowaLina.innerHTML = i + ". hejo mordo (parzysta)";
+        nowaLina.classList.add('parz');
+    } else {
+        nowaLina.innerHTML = i + ". hejo mordo (nieparzysta)";
+        nowaLina.classList.add('nieparz');
+    }
+
+    parNiepar.appendChild(nowaLina);
+}
+
+const pobierzDaneZInternetu = async () => {
+    
+    // 2. Wysyłamy prośbę do sieci i CZEKAMY (await) na odpowiedź
+    const odpowiedz = await fetch('https://jsonplaceholder.typicode.com/users');
+    
+    // 3. Zamieniamy surowe dane z sieci na czystą tablicę JS i znowu CZEKAMY
+    const uzytkownicy = await odpowiedz.json();
+    
+    // Zobaczmy w konsoli przeglądarki (F12), czy dane dopłynęły!
+    console.log(uzytkownicy);
+
+    // 4. Łapiemy nasz ulubiony kontener i wrzucamy dane na stronę!
+    const kontener = document.querySelector('.anythingelse');
+    
+    // Czyścimy stary tekst "hejo mordo", żeby zrobić miejsce
+    kontener.innerHTML = "<h2>Użytkownicy pobrani z sieci:</h2>"; 
+    
+    // Przelatujemy pętlą po 10 użytkownikach z internetu!
+    uzytkownicy.forEach((user) => {
+        kontener.innerHTML += `👤 Imię: <b>${user.name}</b>, Email: ${user.email} <br>`;
+    });
+};
+
+// 5. Odpalamy funkcję!
+pobierzDaneZInternetu();
+
+const odtworzDzwiek = () => {
+    // 🎵 Ścieżka relatywna – wrzuć plik mp3 obok swoich plików HTML/JS!
+    const muzyka = new Audio('Enemy.mp3'); 
+    muzyka.play();
+};
+
+const przyciskfunc = document.querySelector('.przyc');
+
+// 🎛️ Łączymy obie akcje w jedno kliknięcie!
+przyciskfunc.addEventListener('click', () => {
+    stworzNapis("stworzyłem napis"); // 📝 Pierwsza akcja
+                    // 🎵 Druga akcja: wywołujemy całą funkcję dźwięku!
+});
+const wlaczMuzyke = document.querySelector('.music-button');
+wlaczMuzyke.addEventListener('click', () => {
+    odtworzDzwiek()
+})
+const devil = () =>{
+    const inmuzyka = new Audio('The Devil Made Me Do It.mp3');
+    inmuzyka.play();
+};
+const wlaczInnaMuzyke = document.querySelector('.buttonms');
+wlaczInnaMuzyke.addEventListener('click', () => {
+    devil()
+})
