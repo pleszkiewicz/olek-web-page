@@ -231,11 +231,7 @@ const pobierzDaneZInternetu = async () => {
 // 5. Odpalamy funkcję!
 pobierzDaneZInternetu();
 
-const odtworzDzwiek = () => {
-    // 🎵 Ścieżka relatywna – wrzuć plik mp3 obok swoich plików HTML/JS!
-    const muzyka = new Audio('Enemy.mp3'); 
-    muzyka.play();
-};
+const muzyka = new Audio('Enemy.mp3')
 
 const przyciskfunc = document.querySelector('.przyc');
 
@@ -245,14 +241,29 @@ przyciskfunc.addEventListener('click', () => {
                     // 🎵 Druga akcja: wywołujemy całą funkcję dźwięku!
 });
 const wlaczMuzyke = document.querySelector('.music-button');
-wlaczMuzyke.addEventListener('click', () => {
-    odtworzDzwiek()
-})
-const devil = () =>{
-    const inmuzyka = new Audio('The Devil Made Me Do It.mp3');
-    inmuzyka.play();
-};
+const przelocznik = () => {
+    if (muzyka.paused){
+        muzyka.play()
+        wlaczMuzyke.innerText = `zpauzuj "Enemy"`
+        
+    } else {
+        muzyka.pause()
+        wlaczMuzyke.innerText = `włącz "Enemy"`
+    }
+}
+wlaczMuzyke.addEventListener('click', przelocznik)
+const inmuzyka = new Audio('The Devil Made Me Do It.mp3'); 
+
 const wlaczInnaMuzyke = document.querySelector('.buttonms');
-wlaczInnaMuzyke.addEventListener('click', () => {
-    devil()
-})
+
+const przelaczmusic = () => {
+    if (inmuzyka.paused){
+        inmuzyka.play();
+        wlaczInnaMuzyke.innerText = `zpauzuj "the devil made me do it"`
+    } else {
+        inmuzyka.pause();
+        wlaczInnaMuzyke.innerText = `włącz "the devil made me do it"`
+    }
+};
+
+wlaczInnaMuzyke.addEventListener('click', przelaczmusic);
