@@ -422,3 +422,17 @@ body {
     background-color: brown;
     color: greenyellow;
 }
+.sousages{
+    margin: 30px;
+    border-radius: 20px;
+    box-shadow: 20px 20px 30px rgba(0, 0, 0, 0.7);
+    transition: transform 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
+}
+.sousages:hover{
+    box-shadow: 30px 30px 40px rgba(0, 0, 0, 0.9); 
+    transform: scale(1.2);
+}
+.spaceStation{
+    color: blueviolet;
+    margin: 20px;
+}

@@ -145,7 +145,7 @@ const sklepButy = [
     kielbaski.style.display = "none";
     setTimeout(() => {
         kielbaski.style.display = "block";
-    }, 5000);
+    }, 1000);
 
   const calyLicznik = document.querySelector('.licznik'); 
 let czas = 10;
@@ -228,42 +228,104 @@ const pobierzDaneZInternetu = async () => {
     });
 };
 
-// 5. Odpalamy funkcję!
+// 5. Odpalamy funkcję!     
 pobierzDaneZInternetu();
 
-const muzyka = new Audio('Enemy.mp3')
+// 1. Obiekty muzyczne zawsze na samej górze pliku
+const muzyka = new Audio('websites-music/Enemy.mp3'); 
+const inmuzyka = new Audio('websites-music/The Devil Made Me Do It.mp3'); 
 
-const przyciskfunc = document.querySelector('.przyc');
-
-// 🎛️ Łączymy obie akcje w jedno kliknięcie!
-przyciskfunc.addEventListener('click', () => {
-    stworzNapis("stworzyłem napis"); // 📝 Pierwsza akcja
-                    // 🎵 Druga akcja: wywołujemy całą funkcję dźwięku!
-});
+// 2. Łapanie przycisków z HTML
 const wlaczMuzyke = document.querySelector('.music-button');
-const przelocznik = () => {
-    if (muzyka.paused){
-        muzyka.play()
-        wlaczMuzyke.innerText = `zpauzuj "Enemy"`
-        
-    } else {
-        muzyka.pause()
-        wlaczMuzyke.innerText = `włącz "Enemy"`
-    }
-}
-wlaczMuzyke.addEventListener('click', przelocznik)
-const inmuzyka = new Audio('The Devil Made Me Do It.mp3'); 
-
 const wlaczInnaMuzyke = document.querySelector('.buttonms');
 
+// 3. Funkcja dla PIERWSZEGO przycisku (Muzyka: "brum")
+const przelaczMuzyke = () => {
+    // Sprawdzamy czy pierwsza piosenka stoi
+    if (muzyka.paused) {
+        // Zanim włączysz "brum", ucisz i zresetuj "hej!"
+        inmuzyka.pause();
+        inmuzyka.currentTime = 0;
+        wlaczMuzyke.innerText = `spauzuj "Enemy"` 
+        wlaczInnaMuzyke.innerText = `włącz "the devil made me do it"`
+        
+        muzyka.play();
+    } else {
+        muzyka.pause();
+        wlaczMuzyke.innerText = `włącz "Enemy"`
+    }
+};
+
+// 4. Funkcja dla DRUGIEGO przycisku (Muzyka: "hej!")
 const przelaczmusic = () => {
-    if (inmuzyka.paused){
+    // Sprawdzamy czy druga piosenka stoi
+    if (inmuzyka.paused) {
+        // Zanim włączysz "hej!", ucisz i zresetuj "brum"
+        muzyka.pause();
+        muzyka.currentTime = 0; 
+        wlaczInnaMuzyke.innerText = `spauzuj "the devil made me do it"`
         inmuzyka.play();
-        wlaczInnaMuzyke.innerText = `zpauzuj "the devil made me do it"`
+        wlaczMuzyke.innerText = `włącz "Enemy"`
     } else {
         inmuzyka.pause();
         wlaczInnaMuzyke.innerText = `włącz "the devil made me do it"`
     }
 };
 
+// 5. Podpięcie funkcji pod przyciski
+wlaczMuzyke.addEventListener('click', () => {
+    przelaczMuzyke();                // Odpala lub pauzuje pierwszą piosenkę
+});
+
 wlaczInnaMuzyke.addEventListener('click', przelaczmusic);
+
+const daneInternetowe = async () => {
+    const int = await fetch('https://dummyjson.com/quotes');
+    const daneint = await int.json();
+    const kont = document.querySelector('.sth'); // Stworzyłeś zmienną "kont"
+    
+    kont.innerHTML = ""; // Czyszczenie diva przed pętlą
+
+    // Poprawiona pętla: dodane .quotes oraz prawidłowe strzałkowe (element) =>
+    daneint.quotes.forEach((element) => {
+        if (element.author === "Aristotle") {
+            // Zmienione na "kont.innerHTML", żeby pasowało do zmiennej wyżej!
+            kont.innerHTML += `<p>"${element.quote}" - <b>${element.author}</b></p>`;
+        }
+    });
+};
+
+// Odpalamy funkcję!
+daneInternetowe();
+
+const krypto = async () => {
+    const daneKrypto = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd');
+    const odp2 = await daneKrypto.json();
+    const kont2 = document.querySelector('.kryptowaluty')
+    kont2.innerHTML = "";
+    odp2.forEach((element2) => {
+        if (element2.current_price >= 100){
+            kont2.innerHTML += `<p>Nazwa: ${element2.name} (${element2.symbol}). Cena: ${element2.current_price} </p>`;
+        }
+        } 
+    )}     
+
+krypto()
+
+const FromInternet = async () => {
+    // 1. Zmieniamy adres na stabilny, wielki serwer testowy
+    const link = await fetch('https://dummyjson.com/users');
+    const format = await link.json();
+    
+    // Celowo zostawiam Twój kontener .spaceStation, żebyś nie musiał nic zmieniać w HTML!
+    const kont3 = document.querySelector('.spaceStation');
+    kont3.innerHTML = "";
+    
+    // Ta baza trzyma ludzi w szufladzie .users (zamiast .people)
+    format.users.forEach((element3) => {
+        // Filtrujemy np. tylko osoby, które mają zielone oczy (green)
+        if (element3.eyeColor === "Green") {
+            kont3.innerHTML += `<p> 👤 Osoba: ${element3.firstName} ${element3.lastName} (Oczy: ${element3.eyeColor})</p>`;
+        }
+    });
+};
