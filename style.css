@@ -327,85 +327,9 @@ body {
     }
 }
 
-.input-password{
-    margin: 10px;
-    border-radius: 5px;
-}
-.komunikat-sukces {
-    color: limegreen;
-    font-weight: bold;
-}
-.komunikat-sukces {
-    color: red;
-    font-weight: bold;
-}
-.lista-ceny{
-    border: solid snow 3px;
-    margin: 20px;
-    padding: 5px;
-    display: inline-flex;
-    border-radius: 10px;
-}
 
-.lista-cen{
-    border: solid snow 3px;
-    margin: 20px;
-    padding: 5px;
-    display: inline-flex;
-    border-radius: 10px;
-}
-.trzylisty{
-    display: inline-flex;
-}
-.sklepRona{
-    border: dotted red 2px;
-    border-radius: 10px;
-    margin: 10px;
-    padding: 5px;
-    display: inline-flex;
-}
-.bananybla{
-    border-radius: 10px;
-    margin: 10px;
-    
-}
-.zamknij{
-    border-radius: 4px;
-    background-color: greenyellow;
-    height: 20px;
-    
-    
-}
-.bananyniebla{
-    display: inline-flex;
-    border: solid yellow;
-    padding: 5px;
-    margin: 10px;
-    border-radius: 10px;
-}
 
-.alert{
-    border: solid red 2px;
-    display: inline-flex;
-    border-radius: 20px;
-    padding: 5px;
-    margin: 10px;
-}
-.klasa-masa{
-    color: blue;
-    margin: 10px;
-}
-
-.parz{
-    color: red;
-    margin: 0;
-}
-.nieparz{
-    color: green;
-    margin: 0;
-}
-
-.btn-enter, .music-button, .buttonms{
+ .music-button, .buttonms{
     display: block;
     margin-bottom: 10px;
     margin-left: 10px;
@@ -422,17 +346,43 @@ body {
     background-color: brown;
     color: greenyellow;
 }
-.sousages{
-    margin: 30px;
-    border-radius: 20px;
-    box-shadow: 20px 20px 30px rgba(0, 0, 0, 0.7);
-    transition: transform 0.6s ease-in-out, box-shadow 0.6s ease-in-out;
-}
-.sousages:hover{
-    box-shadow: 30px 30px 40px rgba(0, 0, 0, 0.9); 
-    transform: scale(1.2);
-}
 .spaceStation{
     color: blueviolet;
     margin: 20px;
+}
+.noc {
+    background-color: #0b132b !important;
+    color: white !important;
+    padding: 20px;
+    border-radius: 20px;
+}
+.wholeSpaceStation{
+    margin: 20px;
+    padding: 10px;
+    flex-direction: column;
+    display: inline-flex;
+    border: dotted red; 
+    border-radius: 20px;
+    background-color: greenyellow;
+    box-shadow: 30px 30px 40px rgba(0, 0, 0, 0.4);
+    transition: box-shadow 0.5s ease-in-out, transform 0.5s ease-in-out;
+
+}
+.wholeSpaceStation:hover{
+    box-shadow: 70px 70px 70px rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
+}
+.change{
+    width: 100px;
+    height: auto;
+    border-radius: 5px;
+    background-color: green;
+    color: snow;
+}
+.tryb-alarmowy {
+    background-color: #7a0010 !important; /* Krwistoczerwone tło */
+    color: #ffb703 !important;            /* Jaskrawożółty tekst */
+    border: 5px solid #ff0000;
+    padding: 25px;
+    margin: 5px;
 }
